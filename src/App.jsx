@@ -12,6 +12,7 @@ import Admin from './pages/admin/Admin'
 import PagoExito from './pages/pago/PagoExito'
 import PagoError from './pages/pago/PagoError'
 import PagoPendiente from './pages/pago/PagoPendiente'
+import NotFound from './pages/notFound/NotFound'
 
 const App = () => {
   return (
@@ -34,6 +35,8 @@ const App = () => {
             <Route element={<AdminRoute />}>
               <Route path="/admin" element={<Admin />} />
             </Route>
+
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </AuthProvider>
