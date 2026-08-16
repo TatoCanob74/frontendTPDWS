@@ -235,6 +235,7 @@ a:hover { color: var(--green-700); }
 /* =========================================================
    TARJETAS DE RESERVA / TABLAS (Mis reservas, Admin)
    ========================================================= */
+.reserve-list { display: flex; flex-direction: column; gap: 14px; }
 .reserve-card {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 22px 26px; display: flex; flex-wrap: wrap; align-items: center;
@@ -260,6 +261,22 @@ table.data-table tr:last-child td { border-bottom: none; }
   border-radius: 999px; padding: 9px 20px; font-weight: 600; font-size: 14px;
 }
 .tabs button[aria-selected="true"] { background: var(--green-600); border-color: var(--green-600); color: #fff; }
+
+/* ---- ABM: barra de acciones y botones dentro de la tabla ----
+   Escrito mobile-first: el estado base es el de pantalla chica y los
+   @media (min-width) agregan lo de pantallas grandes. */
+.admin-actions { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.admin-actions .btn { width: 100%; }
+
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.row-actions .btn { padding: 7px 14px; font-size: 13px; }
+
+.btn--danger { background: #fdecea; color: #9a3324; border: 1.5px solid #f3b4ac; }
+.btn--danger:hover { background: #f9d9d4; color: #7d2a1d; }
+
+@media (min-width: 640px) {
+  .admin-actions .btn { width: auto; }
+}
 
 /* =========================================================
    FOOTER

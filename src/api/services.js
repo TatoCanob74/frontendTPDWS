@@ -1,6 +1,11 @@
-import { client } from './client'
+import { client, emptyOn404 } from './client'
 
-// TODO backend: no existe todavía GET /services.
+// Rutas reales del backend (rama de Francisco):
+//   GET    /servicios       listado (público)
+//   POST   /servicios       crear    (admin)
+//   PUT    /servicios/:id   editar   (admin)
+//   DELETE /servicios/:id   eliminar (admin)
+
 export function getServices() {
-  return client.get('/services').then((r) => r.data)
+  return emptyOn404(client.get('/servicios').then((r) => r.data))
 }

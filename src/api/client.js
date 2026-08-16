@@ -30,3 +30,13 @@ client.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+// Varios endpoints de listado del backend devuelven 404 cuando no hay registros,
+// en vez de un 200 con lista vacía. Para el frontend "no hay nada" no es un error:
+// es una lista vacía. Este helper normaliza ese caso sin tapar los errores reales.
+export function emptyOn404(promise) {
+  return promise.catch((error) => {
+    if (error.response?.status === 404) return []
+    throw error
+  })
+}

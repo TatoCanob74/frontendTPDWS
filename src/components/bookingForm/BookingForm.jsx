@@ -22,10 +22,6 @@ function dayOfWeek(isoDate) {
   return DAY_BY_INDEX[d.getDay()]
 }
 
-function formatTime(t) {
-  return typeof t === 'string' ? t.slice(0, 5) : t
-}
-
 export default function BookingForm() {
   const [params] = useSearchParams()
   const { isAuthenticated } = useAuth()
@@ -182,7 +178,7 @@ export default function BookingForm() {
               aria-pressed={idHorary === h.idHorary}
               onClick={() => setIdHorary(h.idHorary)}
             >
-              {formatTime(h.startTime)}
+              {h.start}
             </button>
           ))}
         </div>
@@ -220,7 +216,7 @@ export default function BookingForm() {
           <span className="summary__label">Tu reserva</span>
           <span className="summary__value">
             {SPORTS.find((s) => s.value === sport)?.label} · {date} · {day}
-            {selectedHorario ? ` · ${formatTime(selectedHorario.startTime)}` : ' · elegí un horario'}
+            {selectedHorario ? ` · ${selectedHorario.label}` : ' · elegí un horario'}
           </span>
         </div>
         <button className="btn btn--primary" type="submit" disabled={submitting}>

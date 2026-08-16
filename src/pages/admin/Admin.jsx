@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getUsers, getReserves } from '../../api/admin'
+import CourtsTab from './CourtsTab'
 
 function formatMoney(amount) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount)
@@ -126,7 +127,7 @@ function ReservesTab() {
 }
 
 export default function Admin() {
-  const [tab, setTab] = useState('usuarios')
+  const [tab, setTab] = useState('canchas')
 
   return (
     <section className="section shell">
@@ -137,11 +138,14 @@ export default function Admin() {
       </div>
 
       <div className="tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={tab === 'canchas'} onClick={() => setTab('canchas')}>Canchas</button>
         <button type="button" role="tab" aria-selected={tab === 'usuarios'} onClick={() => setTab('usuarios')}>Usuarios</button>
         <button type="button" role="tab" aria-selected={tab === 'reservas'} onClick={() => setTab('reservas')}>Reservas</button>
       </div>
 
-      {tab === 'usuarios' ? <UsersTab /> : <ReservesTab />}
+      {tab === 'canchas' && <CourtsTab />}
+      {tab === 'usuarios' && <UsersTab />}
+      {tab === 'reservas' && <ReservesTab />}
     </section>
   )
 }
