@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getMyReserves, cancelReserve } from '../../api/reserves'
+import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
 export default function Reservas() {
   const [reserves, setReserves] = useState([])
@@ -8,6 +9,9 @@ export default function Reservas() {
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [cancellingId, setCancellingId] = useState(null)
+
+  // Reserva pendiente de confirmación de cancelación (null = diálogo cerrado)
+  const [confirmingCancel, setConfirmingCancel] = useState(null)
 
   const load = useCallback(() => {
     return getMyReserves()
@@ -22,13 +26,13 @@ export default function Reservas() {
     load().finally(() => setLoading(false))
   }, [load])
 
-  async function handleCancel(reserve) {
-    const confirmed = window.confirm(
-      `¿Cancelar la reserva del ${reserve.dateReserve}? Esta acción no se puede deshacer.`
-    )
-    if (!confirmed) return
+  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Cancelar". */
+  async function handleCancelConfirmed() {
+    const reserve = confirmingCancel
+    if (!reserve) return
 
     setCancellingId(reserve.idReserve)
+    setConfirmingCancel(null)
     setNotice(null)
     setError(null)
     try {
@@ -77,7 +81,7 @@ export default function Reservas() {
                   className="btn btn--sm btn--danger"
                   type="button"
                   disabled={cancellingId === r.idReserve}
-                  onClick={() => handleCancel(r)}
+                  onClick={() => setConfirmingCancel(r)}
                 >
                   {cancellingId === r.idReserve ? 'Cancelando…' : 'Cancelar'}
                 </button>
@@ -86,6 +90,21 @@ export default function Reservas() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(confirmingCancel)}
+        tone="danger"
+        title="Cancelar reserva"
+        message={
+          confirmingCancel
+            ? `Vas a cancelar tu reserva del ${confirmingCancel.dateReserve}. Esta acción no se puede deshacer.`
+            : ''
+        }
+        confirmLabel="Sí, cancelar"
+        cancelLabel="Volver"
+        onConfirm={handleCancelConfirmed}
+        onCancel={() => setConfirmingCancel(null)}
+      />
     </section>
   )
 }

@@ -279,6 +279,52 @@ table.data-table tr:last-child td { border-bottom: none; }
 }
 
 /* =========================================================
+   DIÁLOGO DE CONFIRMACIÓN (reemplaza a window.confirm)
+   Mobile-first: en pantalla chica es una hoja pegada abajo con los
+   botones apilados; el @media (min-width) la centra y los alinea.
+   ========================================================= */
+.modal {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px;
+  background: rgba(20, 36, 28, .55);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  animation: modalFade .2s ease;
+}
+.modal__box {
+  width: 100%; max-width: 460px;
+  display: flex; flex-direction: column; gap: 12px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: 26px 24px;
+  box-shadow: 0 30px 60px -20px rgba(27, 42, 35, .45);
+  animation: modalRise .28s var(--ease);
+}
+.modal__icon {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 22px;
+  background: var(--green-50); color: var(--green-700);
+}
+.modal--danger .modal__icon { background: #fdecea; color: #9a3324; }
+.modal__box h3 { font-size: 20px; font-weight: 700; }
+.modal__text { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+.modal__foot { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.modal__foot .btn { width: 100%; }
+
+.btn--danger-solid { background: #9a3324; color: #fff; border: 1.5px solid #9a3324; }
+.btn--danger-solid:hover { background: #7d2a1d; border-color: #7d2a1d; color: #fff; transform: translateY(-2px); }
+.btn--danger-solid:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+@keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+@media (min-width: 640px) {
+  .modal { align-items: center; }
+  .modal__foot { flex-direction: row; justify-content: flex-end; }
+  .modal__foot .btn { width: auto; }
+}
+
+/* =========================================================
    FOOTER
    ========================================================= */
 .footer { background: var(--green-900); color: rgba(255,255,255,.75); padding: 72px 0 32px; }

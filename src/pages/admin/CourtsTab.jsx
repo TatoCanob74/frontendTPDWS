@@ -8,6 +8,7 @@ import {
   getLocations
 } from '../../api/courts'
 import CourtForm from '../../components/courtForm/CourtForm'
+import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
 /** ABM de canchas: listar, crear, editar, habilitar/deshabilitar y eliminar. */
 export default function CourtsTab() {
@@ -21,6 +22,10 @@ export default function CourtsTab() {
   const [editing, setEditing] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState(null)
+
+  // Cancha pendiente de confirmación de borrado (null = diálogo cerrado)
+  const [confirmingDelete, setConfirmingDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   const loadCourts = useCallback(() => {
     return getCourtsForAdmin()
@@ -75,20 +80,22 @@ export default function CourtsTab() {
     }
   }
 
-  async function handleDelete(court) {
-    const confirmed = window.confirm(
-      `¿Eliminar la cancha "${court.nameCourt}"? Esta acción no se puede deshacer.`
-    )
-    if (!confirmed) return
+  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Eliminar". */
+  async function handleDeleteConfirmed() {
+    if (!confirmingDelete) return
 
+    setDeleting(true)
     setNotice(null)
     try {
-      await deleteCourt(court.idCourt)
+      await deleteCourt(confirmingDelete.idCourt)
       setNotice('Cancha eliminada correctamente.')
       await loadCourts()
     } catch (err) {
       // El backend responde 409 si la cancha tiene horarios asociados
       setError(messageFrom(err, 'No pudimos eliminar la cancha.'))
+    } finally {
+      setDeleting(false)
+      setConfirmingDelete(null)
     }
   }
 
@@ -154,7 +161,14 @@ export default function CourtsTab() {
                       <button className="btn btn--sm" type="button" onClick={() => handleToggle(court)}>
                         {court.isAvailable ? 'Deshabilitar' : 'Habilitar'}
                       </button>
-                      <button className="btn btn--sm btn--danger" type="button" onClick={() => handleDelete(court)}>
+                      <button
+                        className="btn btn--sm btn--danger"
+                        type="button"
+                        onClick={() => {
+                          setError(null)
+                          setConfirmingDelete(court)
+                        }}
+                      >
                         Eliminar
                       </button>
                     </div>
@@ -165,6 +179,22 @@ export default function CourtsTab() {
           </table>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(confirmingDelete)}
+        tone="danger"
+        title="Eliminar cancha"
+        message={
+          confirmingDelete
+            ? `Vas a eliminar la cancha "${confirmingDelete.nameCourt}". Esta acción no se puede deshacer.`
+            : ''
+        }
+        confirmLabel="Sí, eliminar"
+        cancelLabel="Volver"
+        busy={deleting}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setConfirmingDelete(null)}
+      />
     </>
   )
 }
