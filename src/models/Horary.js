@@ -5,6 +5,17 @@
  * como un string del enum ('Lunes', 'Martes', …). Esta clase se encarga de
  * presentarlos, para que las pantallas no tengan que recortar strings a mano.
  */
+/** Dias del enum del backend. El orden y los acentos tienen que coincidir exacto. */
+export const DAYS = [
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+  'Domingo'
+]
+
 export class Horary {
   constructor({ idHorary, idCourt, startTime, endTime, day }) {
     this.idHorary = idHorary

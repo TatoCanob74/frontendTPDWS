@@ -105,7 +105,7 @@ export default function CourtForm({
             id="hourlyPrice"
             name="hourlyPrice"
             min="1"
-            step="0.01"
+            step="1"
             required
             value={form.hourlyPrice}
             onChange={handleChange}

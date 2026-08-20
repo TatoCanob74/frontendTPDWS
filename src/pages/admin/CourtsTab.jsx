@@ -136,7 +136,7 @@ export default function CourtsTab() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th><th>Nombre</th><th>Deporte</th><th>Precio</th>
+                <th>ID</th><th>Nombre</th><th>Deporte</th><th>Sede</th><th>Precio</th>
                 <th>Capacidad</th><th>Estado</th><th>Acciones</th>
               </tr>
             </thead>
@@ -146,6 +146,7 @@ export default function CourtsTab() {
                   <td>{court.idCourt}</td>
                   <td>{court.nameCourt}</td>
                   <td>{court.typeIcon} {court.typeLabel}</td>
+                  <td>{court.locationName ?? <span className="hint">sin sede</span>}</td>
                   <td>{court.formattedPrice}</td>
                   <td>{court.capacityPlayers}</td>
                   <td>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getUsers, getReserves } from '../../api/admin'
 import CourtsTab from './CourtsTab'
+import HorariesTab from './HorariesTab'
 
 function formatMoney(amount) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount)
@@ -134,16 +135,18 @@ export default function Admin() {
       <div className="section-head">
         <span className="eyebrow">Panel</span>
         <h2>Administración</h2>
-        <p>Gestioná usuarios y reservas de CanchaYa.</p>
+        <p>Gestioná canchas, horarios, usuarios y reservas de CanchaYa.</p>
       </div>
 
       <div className="tabs" role="tablist">
         <button type="button" role="tab" aria-selected={tab === 'canchas'} onClick={() => setTab('canchas')}>Canchas</button>
+        <button type="button" role="tab" aria-selected={tab === 'horarios'} onClick={() => setTab('horarios')}>Horarios</button>
         <button type="button" role="tab" aria-selected={tab === 'usuarios'} onClick={() => setTab('usuarios')}>Usuarios</button>
         <button type="button" role="tab" aria-selected={tab === 'reservas'} onClick={() => setTab('reservas')}>Reservas</button>
       </div>
 
       {tab === 'canchas' && <CourtsTab />}
+      {tab === 'horarios' && <HorariesTab />}
       {tab === 'usuarios' && <UsersTab />}
       {tab === 'reservas' && <ReservesTab />}
     </section>
