@@ -1,5 +1,8 @@
 import { client, emptyOn404 } from './client'
 import { Court } from '../models/Court'
+import { getLocations } from './locations'
+
+export { getLocations }
 
 // Rutas reales del backend (rama de Francisco):
 //   GET    /canchas/verCanchas   listado con horarios anidados (requiere token)
@@ -8,7 +11,7 @@ import { Court } from '../models/Court'
 //   PUT    /canchas/:id          editar           (admin)
 //   PATCH  /canchas/:id/estado   alternar estado  (admin)
 //   DELETE /canchas/:id          eliminar         (admin)
-//   GET    /localidades          sedes (público)
+// Ver api/locations.js para las sedes (`/localidades`).
 
 /**
  * Canchas disponibles, con sus horarios.
@@ -47,10 +50,6 @@ export function toggleCourtState(idCourt) {
 
 export function deleteCourt(idCourt) {
   return client.delete(`/canchas/${idCourt}`).then((r) => r.data)
-}
-
-export function getLocations() {
-  return emptyOn404(client.get('/localidades').then((r) => r.data))
 }
 
 /**
