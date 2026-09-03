@@ -1,8 +1,26 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { usePaymentReturn } from '../../hooks/usePaymentReturn'
+
+// Cuánto se espera antes de llevar al usuario a "Mis reservas". Lo justo para
+// que llegue a leer el resultado del pago sin quedarse en una pantalla muerta.
+const REDIRECT_DELAY_MS = 4000
 
 export default function PagoExito() {
   const { loading, reserve, error } = usePaymentReturn()
+  const navigate = useNavigate()
+
+  // Antes había que apretar el botón sí o sí: si el usuario no lo veía, se
+  // quedaba en la pantalla de pago sin saber si la reserva había quedado hecha.
+  useEffect(() => {
+    if (loading) return
+
+    const timer = setTimeout(() => {
+      navigate('/reservas', { replace: true })
+    }, REDIRECT_DELAY_MS)
+
+    return () => clearTimeout(timer)
+  }, [loading, navigate])
 
   return (
     <section className="section shell">
@@ -23,6 +41,7 @@ export default function PagoExito() {
           </div>
         )}
         <Link className="btn btn--primary" to="/reservas">Ver mis reservas</Link>
+        {!loading && <p className="hint">Te llevamos a tus reservas en unos segundos…</p>}
       </div>
     </section>
   )

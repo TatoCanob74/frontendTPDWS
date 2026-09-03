@@ -8,6 +8,7 @@ import { Reserve } from '../models/Reserve'
 //   POST  /reserves/:id/pago            preferencia de MercadoPago
 //   POST  /reserves/:id/pago/confirmar  confirmar el pago al volver del checkout
 //   GET   /reserves/:id/pago            estado del pago
+//   POST  /reservas/sincronizar-pagos   pone al día las reservas pendientes
 
 export function createReserve({ typeCourt, idLocateCourt, dateReserve, day, idHorary, services }) {
   return client
@@ -47,4 +48,16 @@ export function confirmPayment(idReserve, paymentId) {
 
 export function getPaymentStatus(idReserve) {
   return client.get(`/reserves/${idReserve}/pago`).then((r) => r.data)
+}
+
+/**
+ * Vuelve a consultar en MercadoPago las reservas pendientes del usuario.
+ *
+ * Sirve para el caso en que el pago se aprobó pero la reserva quedó en
+ * "pendiente": pasa cuando el usuario cierra la pestaña antes de volver del
+ * checkout, o cuando el backend corre en localhost y MercadoPago no puede
+ * llamar al webhook.
+ */
+export function syncPayments() {
+  return client.post('/reservas/sincronizar-pagos').then((r) => r.data)
 }

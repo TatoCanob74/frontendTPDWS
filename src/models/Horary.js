@@ -16,6 +16,25 @@ export const DAYS = [
   'Domingo'
 ]
 
+/**
+ * Franjas horarias para filtrar los listados de horarios, que enseguida se
+ * vuelven demasiado largos para elegir a ojo.
+ *
+ * El rango es [from, to): se compara contra la hora de inicio del horario. Los
+ * límites coinciden con los que acepta `GET /horarios?from=&to=` del backend,
+ * así que la misma franja sirve para filtrar en el cliente o en el servidor.
+ */
+export const SHIFTS = [
+  { value: 'manana', label: 'Mañana', from: '06:00', to: '12:00' },
+  { value: 'tarde', label: 'Tarde', from: '12:00', to: '18:00' },
+  { value: 'noche', label: 'Noche', from: '18:00', to: '23:59' }
+]
+
+/** Busca una franja por su valor. Devuelve null para "todas". */
+export function findShift(value) {
+  return SHIFTS.find((shift) => shift.value === value) ?? null
+}
+
 export class Horary {
   constructor({ idHorary, idCourt, startTime, endTime, day }) {
     this.idHorary = idHorary
@@ -50,6 +69,13 @@ export class Horary {
   /** "18:00 - 19:00" */
   get label() {
     return `${this.start} - ${this.end}`
+  }
+
+  /** ¿Empieza dentro de la franja? Sin franja ('' o desconocida) entra siempre. */
+  matchesShift(shiftValue) {
+    const shift = findShift(shiftValue)
+    if (!shift) return true
+    return this.start >= shift.from && this.start < shift.to
   }
 }
 

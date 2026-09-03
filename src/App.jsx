@@ -8,6 +8,7 @@ import Login from './pages/login/Login'
 import Register from './pages/register/Register'
 import Canchas from './pages/canchas/Canchas'
 import Reservas from './pages/reservas/Reservas'
+import Perfil from './pages/perfil/Perfil'
 import Admin from './pages/admin/Admin'
 import PagoExito from './pages/pago/PagoExito'
 import PagoError from './pages/pago/PagoError'
@@ -30,6 +31,7 @@ const App = () => {
 
             <Route element={<PrivateRoute />}>
               <Route path="/reservas" element={<Reservas />} />
+              <Route path="/perfil" element={<Perfil />} />
             </Route>
 
             <Route element={<AdminRoute />}>

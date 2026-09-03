@@ -1,6 +1,19 @@
 import { Court } from './Court.js'
 import { Horary } from './Horary.js'
 
+/** Estados de pago que devuelve MercadoPago, con su texto para la UI. */
+const PAYMENT_LABELS = {
+  approved: 'Pago aprobado',
+  authorized: 'Pago autorizado',
+  in_process: 'Pago en revisión',
+  in_mediation: 'Pago en disputa',
+  pending: 'Pago pendiente',
+  rejected: 'Pago rechazado',
+  cancelled: 'Pago cancelado',
+  refunded: 'Pago devuelto',
+  charged_back: 'Pago con contracargo'
+}
+
 const currency = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
@@ -80,6 +93,17 @@ export class Reserve {
   /** "18:00 - 19:00" si el endpoint incluyó el horario; si no, null. */
   get scheduleLabel() {
     return this.horary?.label ?? null
+  }
+
+  /** "Pago aprobado" si ya hubo un intento de pago; null si todavía no se pagó. */
+  get paymentLabel() {
+    if (!this.paymentStatus) return null
+    return PAYMENT_LABELS[this.paymentStatus] ?? `Pago: ${this.paymentStatus}`
+  }
+
+  /** Una reserva pendiente sin pago aprobado se puede (re)pagar. */
+  get canBePaid() {
+    return this.isPending && this.paymentStatus !== 'approved'
   }
 }
 

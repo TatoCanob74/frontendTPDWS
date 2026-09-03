@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { getHorarios, getLocations } from '../../api/courts'
 import { getServices } from '../../api/services'
 import { createReserve, createPaymentPreference } from '../../api/reserves'
+import { SHIFTS } from '../../models/Horary'
 
 const SPORTS = [
   { value: 'futbol', label: 'Fútbol', icon: '⚽' },
@@ -32,6 +33,10 @@ export default function BookingForm() {
   const [idLocateCourt, setIdLocateCourt] = useState('')
   const [idHorary, setIdHorary] = useState(null)
   const [selectedServices, setSelectedServices] = useState([])
+
+  // Franja horaria del filtro ('' = todas). Una sede con varias canchas devuelve
+  // decenas de horarios para un mismo día; sin filtro son inelegibles a ojo.
+  const [shift, setShift] = useState('')
 
   const [locations, setLocations] = useState([])
   const [locationsError, setLocationsError] = useState(false)
@@ -75,6 +80,20 @@ export default function BookingForm() {
   const horariosLoading = Boolean(horariosKey) && horariosResult.key !== horariosKey
   const horarios = horariosResult.key === horariosKey ? horariosResult.data : []
   const horariosError = horariosResult.key === horariosKey && horariosResult.error
+
+  const visibleHorarios = horarios.filter((h) => h.matchesShift(shift))
+
+  /** Alterna la franja. Volver a tocar la franja activa vuelve a "todas". */
+  function toggleShift(value) {
+    const next = shift === value ? '' : value
+    setShift(next)
+
+    // Si el horario elegido queda fuera del filtro, se deselecciona: no puede
+    // quedar seleccionado algo que el usuario ya no ve en pantalla.
+    if (selectedHorario && !selectedHorario.matchesShift(next)) {
+      setIdHorary(null)
+    }
+  }
 
   function toggleService(idService) {
     setSelectedServices((prev) =>
@@ -169,8 +188,26 @@ export default function BookingForm() {
 
       <div className="field">
         <span className="field__label" id="lbl-horario">Horario ({day})</span>
+
+        <div className="sports-tabs" role="group" aria-label="Filtrar por turno">
+          <button type="button" className="chip" aria-pressed={shift === ''} onClick={() => setShift('')}>
+            Todos
+          </button>
+          {SHIFTS.map((s) => (
+            <button
+              key={s.value}
+              type="button"
+              className="chip"
+              aria-pressed={shift === s.value}
+              onClick={() => toggleShift(s.value)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+
         <div className="slots" role="group" aria-labelledby="lbl-horario">
-          {horarios.map((h) => (
+          {visibleHorarios.map((h) => (
             <button
               key={h.idHorary}
               type="button"
@@ -189,6 +226,12 @@ export default function BookingForm() {
         )}
         {idLocateCourt && !horariosLoading && !horariosError && horarios.length === 0 && (
           <p className="hint">No hay horarios para ese deporte, sede y día.</p>
+        )}
+        {idLocateCourt && !horariosLoading && !horariosError && horarios.length > 0 && visibleHorarios.length === 0 && (
+          <p className="hint">No hay horarios en ese turno. Probá con otro.</p>
+        )}
+        {visibleHorarios.length > 0 && (
+          <p className="hint">{`${visibleHorarios.length} horario(s) disponible(s).`}</p>
         )}
       </div>
 

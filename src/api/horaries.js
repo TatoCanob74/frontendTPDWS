@@ -2,15 +2,18 @@ import { client, emptyOn404 } from './client'
 import { Horary } from '../models/Horary'
 
 // Rutas reales del backend:
-//   GET    /horarios?idCourt=&day=   listado   (público)
+//   GET    /horarios?idCourt=&day=&from=&to=   listado   (público)
 //   POST   /horarios                 crear     (admin)
 //   PUT    /horarios/:id             editar    (admin)
 //   DELETE /horarios/:id             eliminar  (admin)
 
-/** Horarios configurados, opcionalmente filtrados por cancha y/o día. */
-export function getHoraries({ idCourt, day } = {}) {
+/**
+ * Horarios configurados, opcionalmente filtrados por cancha, día y franja.
+ * `from`/`to` acotan por hora de inicio ("HH:MM"), con `to` exclusivo.
+ */
+export function getHoraries({ idCourt, day, from, to } = {}) {
   return emptyOn404(
-    client.get('/horarios', { params: { idCourt, day } }).then((r) => r.data)
+    client.get('/horarios', { params: { idCourt, day, from, to } }).then((r) => r.data)
   ).then(Horary.fromList)
 }
 

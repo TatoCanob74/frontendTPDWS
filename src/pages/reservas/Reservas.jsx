@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getMyReserves, cancelReserve } from '../../api/reserves'
+import { getMyReserves, cancelReserve, createPaymentPreference, syncPayments } from '../../api/reserves'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
 export default function Reservas() {
@@ -9,6 +9,9 @@ export default function Reservas() {
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [cancellingId, setCancellingId] = useState(null)
+
+  // idReserve cuyo link de pago se está generando (null = ninguno)
+  const [payingId, setPayingId] = useState(null)
 
   // Reserva pendiente de confirmación de cancelación (null = diálogo cerrado)
   const [confirmingCancel, setConfirmingCancel] = useState(null)
@@ -23,7 +26,14 @@ export default function Reservas() {
   }, [])
 
   useEffect(() => {
-    load().finally(() => setLoading(false))
+    // Un pago aprobado puede no haber quedado registrado todavía: pasa si el
+    // usuario cerró la pestaña de MercadoPago antes de volver, o si el webhook
+    // no llega (backend en localhost). Se sincroniza antes de listar para que la
+    // reserva aparezca con el estado real y no "pendiente" para siempre.
+    syncPayments()
+      .catch(() => null)
+      .then(load)
+      .finally(() => setLoading(false))
   }, [load])
 
   /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Cancelar". */
@@ -44,6 +54,20 @@ export default function Reservas() {
       setError(err.response?.data?.error || 'No pudimos cancelar la reserva.')
     } finally {
       setCancellingId(null)
+    }
+  }
+
+  /** Retoma el pago de una reserva que quedó pendiente. */
+  async function handlePay(reserve) {
+    setPayingId(reserve.idReserve)
+    setNotice(null)
+    setError(null)
+    try {
+      const { init_point } = await createPaymentPreference(reserve.idReserve)
+      window.location.assign(init_point)
+    } catch (err) {
+      setError(err.response?.data?.message || 'No pudimos generar el link de pago.')
+      setPayingId(null)
     }
   }
 
@@ -73,19 +97,32 @@ export default function Reservas() {
               <div>
                 <strong>{r.courtLabel ?? `Cancha #${r.idCourt}`}</strong> · {r.dateReserve}
                 {r.scheduleLabel ? ` · ${r.scheduleLabel}` : ''}
+                {r.paymentLabel && <div className="hint">{r.paymentLabel}</div>}
               </div>
               <div>{r.formattedAmount}</div>
               <span className={`status-pill status-pill--${r.stateReserva}`}>{r.stateReserva}</span>
-              {r.canBeCancelled && (
-                <button
-                  className="btn btn--sm btn--danger"
-                  type="button"
-                  disabled={cancellingId === r.idReserve}
-                  onClick={() => setConfirmingCancel(r)}
-                >
-                  {cancellingId === r.idReserve ? 'Cancelando…' : 'Cancelar'}
-                </button>
-              )}
+              <div className="row-actions">
+                {r.canBePaid && (
+                  <button
+                    className="btn btn--sm btn--primary"
+                    type="button"
+                    disabled={payingId === r.idReserve}
+                    onClick={() => handlePay(r)}
+                  >
+                    {payingId === r.idReserve ? 'Abriendo pago…' : 'Pagar'}
+                  </button>
+                )}
+                {r.canBeCancelled && (
+                  <button
+                    className="btn btn--sm btn--danger"
+                    type="button"
+                    disabled={cancellingId === r.idReserve}
+                    onClick={() => setConfirmingCancel(r)}
+                  >
+                    {cancellingId === r.idReserve ? 'Cancelando…' : 'Cancelar'}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

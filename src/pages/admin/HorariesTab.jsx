@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getHoraries, createHorary, updateHorary, deleteHorary } from '../../api/horaries'
 import { getCourtsForAdmin } from '../../api/courts'
-import { DAYS } from '../../models/Horary'
+import { DAYS, SHIFTS, findShift } from '../../models/Horary'
 import HoraryForm from '../../components/horaryForm/HoraryForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
@@ -18,10 +18,11 @@ export default function HorariesTab() {
   // Filtros del listado
   const [filterCourt, setFilterCourt] = useState('')
   const [filterDay, setFilterDay] = useState('')
+  const [filterShift, setFilterShift] = useState('')
 
   // Se incrementa después de cada alta/edición/baja para forzar la recarga.
   const [reloadToken, setReloadToken] = useState(0)
-  const filterKey = `${filterCourt}|${filterDay}|${reloadToken}`
+  const filterKey = `${filterCourt}|${filterDay}|${filterShift}|${reloadToken}`
 
   // El resultado se guarda junto con la "clave" del pedido que lo originó, para
   // derivar loading y error comparando esa clave contra los filtros actuales.
@@ -47,9 +48,15 @@ export default function HorariesTab() {
 
   useEffect(() => {
     let ignore = false
+    // La franja se traduce a from/to y la resuelve el backend, para no traer
+    // todos los horarios de la cancha y descartarlos acá.
+    const shift = findShift(filterShift)
+
     getHoraries({
       idCourt: filterCourt || undefined,
-      day: filterDay || undefined
+      day: filterDay || undefined,
+      from: shift?.from,
+      to: shift?.to
     })
       .then((data) => {
         if (!ignore) setResult({ key: filterKey, horaries: data, error: null })
@@ -62,7 +69,7 @@ export default function HorariesTab() {
     return () => {
       ignore = true
     }
-  }, [filterKey, filterCourt, filterDay])
+  }, [filterKey, filterCourt, filterDay, filterShift])
 
   const loading = result.key !== filterKey
   const horaries = result.key === filterKey ? result.horaries : []
@@ -155,7 +162,7 @@ export default function HorariesTab() {
         <p className="hint">Cargá al menos una cancha antes de definir horarios.</p>
       )}
 
-      <div className="field__row" style={{ marginBottom: 20 }}>
+      <div className="filters">
         <div className="field">
           <label className="field__label" htmlFor="filtro-cancha">Cancha</label>
           <select
@@ -184,6 +191,20 @@ export default function HorariesTab() {
             ))}
           </select>
         </div>
+        <div className="field">
+          <label className="field__label" htmlFor="filtro-turno">Turno</label>
+          <select
+            className="input"
+            id="filtro-turno"
+            value={filterShift}
+            onChange={(e) => setFilterShift(e.target.value)}
+          >
+            <option value="">Todos</option>
+            {SHIFTS.map((s) => (
+              <option key={s.value} value={s.value}>{`${s.label} (${s.from} a ${s.to})`}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {notice && <div className="alert" role="status">{notice}</div>}
@@ -194,6 +215,10 @@ export default function HorariesTab() {
 
       {!loading && !loadError && horaries.length === 0 && (
         <p className="hint">No hay horarios para ese filtro.</p>
+      )}
+
+      {!loading && !loadError && horaries.length > 0 && (
+        <p className="hint">{`${horaries.length} horario(s) para el filtro actual.`}</p>
       )}
 
       {!loading && !loadError && horaries.length > 0 && (

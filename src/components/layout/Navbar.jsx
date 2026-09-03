@@ -18,7 +18,7 @@ export default function Navbar() {
           <span className="brand__name">CanchaYa</span>
         </Link>
         <div className="nav__links">
-          <Link className="nav__link" to="/canchas">Canchas</Link>
+          <Link className="nav__link" to="/canchas">Reservar</Link>
           {isAuthenticated && (
             <Link className="nav__link" to="/reservas">Mis reservas</Link>
           )}
@@ -27,7 +27,9 @@ export default function Navbar() {
           )}
           {isAuthenticated ? (
             <>
-              <span className="nav__user">{user?.emailUser}</span>
+              <Link className="nav__user" to="/perfil" title="Ver y editar mi perfil">
+                {user?.emailUser}
+              </Link>
               <button className="nav__cta" type="button" onClick={handleLogout}>Cerrar sesión</button>
             </>
           ) : (
