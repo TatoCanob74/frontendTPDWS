@@ -83,6 +83,12 @@ export default function BookingForm() {
 
   const visibleHorarios = horarios.filter((h) => h.matchesShift(shift))
 
+  // Se declara acá, junto al resto de los valores derivados y ANTES de las
+  // funciones que la usan (toggleShift y handleSubmit). Estando declarada
+  // después, cualquier llamada durante el render rompía con
+  // "Cannot access 'selectedHorario' before initialization".
+  const selectedHorario = horarios.find((h) => h.idHorary === idHorary)
+
   /** Alterna la franja. Volver a tocar la franja activa vuelve a "todas". */
   function toggleShift(value) {
     const next = shift === value ? '' : value
@@ -129,13 +135,18 @@ export default function BookingForm() {
     } catch (err) {
       setStatus({
         type: 'error',
-        message: err.response?.data?.message || 'No pudimos completar la reserva. Probá de nuevo.'
+        // El backend manda unos errores bajo `error` (reserva) y otros bajo
+        // `message` (pago), así que se contemplan los dos: leyendo solo
+        // `message` los motivos reales de rechazo quedaban invisibles.
+        message:
+          err.response?.data?.error ||
+          err.response?.data?.message ||
+          'No pudimos completar la reserva. Probá de nuevo.'
       })
       setSubmitting(false)
     }
   }
 
-  const selectedHorario = horarios.find((h) => h.idHorary === idHorary)
 
   return (
     <form className="booking" onSubmit={handleSubmit} noValidate>
@@ -213,9 +224,11 @@ export default function BookingForm() {
               type="button"
               className="chip slot"
               aria-pressed={idHorary === h.idHorary}
+              aria-label={h.courtName ? `${h.start}, ${h.courtName}` : h.start}
               onClick={() => setIdHorary(h.idHorary)}
             >
               {h.start}
+              {h.courtName && <small className="slot__court">{h.courtName}</small>}
             </button>
           ))}
         </div>
@@ -259,7 +272,9 @@ export default function BookingForm() {
           <span className="summary__label">Tu reserva</span>
           <span className="summary__value">
             {SPORTS.find((s) => s.value === sport)?.label} · {date} · {day}
-            {selectedHorario ? ` · ${selectedHorario.label}` : ' · elegí un horario'}
+            {selectedHorario
+              ? ` · ${selectedHorario.label}${selectedHorario.courtName ? ` · ${selectedHorario.courtName}` : ''}`
+              : ' · elegí un horario'}
           </span>
         </div>
         <button className="btn btn--primary" type="submit" disabled={submitting}>

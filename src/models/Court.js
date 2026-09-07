@@ -74,9 +74,15 @@ export class Court {
     return this.location?.nomLocation ?? null
   }
 
-  /** Horarios de esta cancha para un día concreto ('Lunes', 'Martes', …). */
+  /**
+   * Horarios de esta cancha para un día concreto ('Lunes', 'Martes', …).
+   * Se les adjunta el nombre de la cancha para poder distinguir en pantalla dos
+   * franjas de la misma hora pertenecientes a canchas diferentes.
+   */
   horariesForDay(day) {
-    return this.horaries.filter((h) => h.day === day)
+    return this.horaries
+      .filter((h) => h.day === day)
+      .map((h) => Horary.fromDTO({ ...h, courtName: this.nameCourt }))
   }
 
   /** Los campos que espera el backend al crear o editar. Nunca manda el id. */

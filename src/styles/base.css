@@ -215,7 +215,17 @@ a.nav__user:hover { color: #fff; text-decoration: underline; }
 .input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .6; }
 
 .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
-.slot { padding: 11px 6px; border-radius: var(--radius-sm); font-size: 13.5px; }
+.slot {
+  padding: 11px 6px; border-radius: var(--radius-sm); font-size: 13.5px;
+  /* El slot puede mostrar la hora y, debajo, el nombre de la cancha. */
+  display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.25;
+}
+/* Nombre de la cancha dentro del slot: dos canchas pueden tener la misma hora. */
+.slot__court {
+  font-size: 10.5px; font-weight: 600; opacity: .7;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slot[aria-pressed="true"] .slot__court { opacity: .9; }
 .slot[aria-pressed="true"] { background: var(--green-600); border-color: var(--green-600); color: #fff; }
 .slot:disabled { background: #f3f4f3; border-color: var(--line); color: #b6c0ba; text-decoration: line-through; cursor: not-allowed; }
 .hint { font-size: 12.5px; color: #93a39a; }
@@ -259,7 +269,13 @@ table.data-table th, table.data-table td { padding: 12px 16px; text-align: left;
 table.data-table th { background: var(--surface-alt); font-weight: 700; color: var(--ink-soft); }
 table.data-table tr:last-child td { border-bottom: none; }
 
-.tabs { display: flex; gap: 10px; margin-bottom: 24px; }
+.tabs {
+  display: flex; gap: 10px; margin-bottom: 24px;
+  /* Con 6 pestañas la fila mide ~700px y se salía de pantalla en mobile.
+     Se permite que bajen de línea y, si aún no entran, que scrolleen. */
+  flex-wrap: wrap; max-width: 100%;
+}
+.tabs button { flex: 0 0 auto; white-space: nowrap; }
 .tabs button {
   background: var(--surface-in); border: 1.5px solid var(--line-strong); color: var(--muted);
   border-radius: 999px; padding: 9px 20px; font-weight: 600; font-size: 14px;
@@ -377,8 +393,12 @@ table.data-table tr:last-child td { border-bottom: none; }
    ========================================================= */
 @media (max-width: 720px) {
   .section { padding-block: 72px; }
-  .nav__links { gap: 14px; }
+  .nav__links { gap: 14px; min-width: 0; }
   .nav__link { display: none; }
+  /* El email del usuario es largo y empujaba "Cerrar sesión" fuera de la
+     pantalla. Se oculta en mobile: el perfil sigue accesible desde el menú. */
+  .nav__user { display: none; }
+  .nav__inner { gap: 10px; min-width: 0; }
   .hero { min-height: auto; padding: 120px 20px 72px; }
   .hero__stats { gap: 22px; }
   .stat__sep { display: none; }

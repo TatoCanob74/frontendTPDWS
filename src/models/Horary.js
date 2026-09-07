@@ -36,12 +36,17 @@ export function findShift(value) {
 }
 
 export class Horary {
-  constructor({ idHorary, idCourt, startTime, endTime, day }) {
+  constructor({ idHorary, idCourt, startTime, endTime, day, courtName = null }) {
     this.idHorary = idHorary
     this.idCourt = idCourt
     this.startTime = startTime
     this.endTime = endTime
     this.day = day
+    // Nombre de la cancha a la que pertenece el horario. Solo lo completan las
+    // pantallas que arman el horario a partir de una cancha (ver
+    // Court.horariesForDay): en un mismo día y sede puede haber dos franjas de
+    // "10:00" de canchas distintas, y sin esto son indistinguibles en pantalla.
+    this.courtName = courtName
   }
 
   /** Factory Method: construye una instancia desde la respuesta cruda del backend. */
