@@ -1,0 +1,28 @@
+// =========================================================
+//  CanchaYa — hoja de estilos principal
+// =========================================================
+//
+// Punto de entrada único: es el que importa main.jsx. Cada parcial cubre un
+// bloque de la interfaz y se puede leer por separado.
+//
+// Metodología:
+//   · BEM para los nombres de clase (.card, .card__foot, .card--padel),
+//     aprovechando el anidado de Sass con el selector padre `&`.
+//   · Mobile-first: el estado base es el de pantalla chica y los mixins
+//     `sm` / `md` / `lg` de _mixins.scss agregan lo de pantallas grandes.
+//     No hay una sola media query `max-width` en toda la hoja.
+//   · Design tokens en _tokens.scss como custom properties de CSS, para que
+//     los valores queden disponibles también en tiempo de ejecución.
+
+@use 'tokens';
+@use 'reset';
+@use 'layout';
+@use 'buttons';
+@use 'nav';
+@use 'hero';
+@use 'cards';
+@use 'forms';
+@use 'tables';
+@use 'modal';
+@use 'footer';
+@use 'animations';

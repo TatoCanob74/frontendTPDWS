@@ -1,0 +1,259 @@
+@use 'mixins' as *;
+
+// =========================================================
+//  RESERVA (formulario) Y FORMULARIOS EN GENERAL
+// =========================================================
+.booking {
+  max-width: 720px;
+  margin-inline: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px -28px rgba(27, 42, 35, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+
+  // En mobile la tarjeta ocupa casi todo el ancho: un padding de 36px se come
+  // el espacio útil de los campos.
+  padding: 24px 20px;
+  border-radius: var(--radius-lg);
+
+  @include md {
+    padding: 36px;
+    border-radius: var(--radius-xl);
+  }
+
+  &__foot {
+    display: flex;
+    gap: 16px;
+    border-top: 1px solid #edf2ee;
+    padding-top: 22px;
+
+    // Apilado y a todo el ancho en mobile: el botón principal tiene que ser
+    // fácil de tocar con el pulgar.
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn {
+      width: 100%;
+    }
+
+    @include md {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+
+      .btn {
+        width: auto;
+      }
+    }
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  // Dos campos por fila solo cuando hay ancho; si no, uno debajo del otro.
+  &__row {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+
+    @include md {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+// Fila de filtros de un listado: se adapta a 2, 3 o 4 campos sin romperse.
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.chip {
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface-in);
+  color: var(--muted);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 8px;
+  transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease,
+    transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--green-600);
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--green-50);
+    border-color: var(--green-600);
+    color: var(--green-700);
+  }
+}
+
+.sports-tabs {
+  display: grid;
+  gap: 10px;
+
+  // En pantallas muy angostas los tres deportes en fila quedan ilegibles:
+  // se apilan y el ícono pasa al costado del texto.
+  grid-template-columns: 1fr;
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 8px;
+    flex-direction: row;
+    justify-content: center;
+
+    span {
+      font-size: 24px;
+      line-height: 1;
+    }
+  }
+
+  @include sm {
+    grid-template-columns: repeat(3, 1fr);
+
+    .chip {
+      flex-direction: column;
+      justify-content: initial;
+    }
+  }
+}
+
+.input {
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface-in);
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+
+  &:focus {
+    border-color: var(--green-600);
+  }
+
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+}
+
+// Grilla de horarios. Las celdas son más angostas en mobile para que entren
+// al menos tres por fila.
+.slots {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+
+  @include md {
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  }
+}
+
+.slot {
+  padding: 11px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  // El slot puede mostrar la hora y, debajo, el nombre de la cancha.
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.25;
+
+  // Nombre de la cancha dentro del slot: dos canchas pueden tener la misma hora.
+  &__court {
+    font-size: 10.5px;
+    font-weight: 600;
+    opacity: 0.7;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--green-600);
+    border-color: var(--green-600);
+    color: #fff;
+
+    .slot__court {
+      opacity: 0.9;
+    }
+  }
+
+  &:disabled {
+    background: #f3f4f3;
+    border-color: var(--line);
+    color: #b6c0ba;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+}
+
+.hint {
+  font-size: 12.5px;
+  color: #93a39a;
+
+  &--error {
+    color: #9a3324;
+    font-weight: 500;
+  }
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &__label {
+    font-size: 13px;
+    color: var(--muted-soft);
+  }
+
+  &__value {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+  }
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--green-50);
+  border: 1px solid #b7d4c5;
+  color: var(--green-700);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14.5px;
+  font-weight: 500;
+
+  &--error {
+    background: #fdecea;
+    border-color: #f3b4ac;
+    color: #9a3324;
+  }
+}

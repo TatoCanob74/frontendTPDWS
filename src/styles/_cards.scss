@@ -1,0 +1,189 @@
+// =========================================================
+//  DEPORTES
+// =========================================================
+// El grid es fluido con auto-fit: pasa solo de 1 a 2 y a 3 columnas según el
+// ancho disponible, sin necesidad de media queries.
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 36px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s ease,
+    border-color 0.35s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 48px -16px rgba(45, 106, 79, 0.28);
+    border-color: #b7d4c5;
+  }
+
+  &__icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    background: linear-gradient(135deg, var(--green-600), var(--green-500));
+  }
+
+  &--tenis &__icon {
+    background: linear-gradient(135deg, var(--green-700), var(--green-600));
+  }
+
+  &--padel &__icon {
+    background: linear-gradient(135deg, var(--green-500), var(--green-300));
+  }
+
+  h3 {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  &__desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  &__feats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 14px;
+      color: var(--ink-soft);
+
+      &::before {
+        content: '✓';
+        color: var(--green-600);
+        font-weight: 700;
+      }
+    }
+  }
+
+  &__foot {
+    margin-top: auto;
+    padding-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__price {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--green-600);
+
+    small {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      color: var(--muted-soft);
+    }
+  }
+
+  &__cta {
+    background: var(--green-600);
+    color: #fff;
+
+    &:hover {
+      background: var(--green-700);
+      color: #fff;
+    }
+  }
+}
+
+// =========================================================
+//  CÓMO FUNCIONA
+// =========================================================
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+.step {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 40px 30px 34px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  &__num {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--green-600);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 6px 16px rgba(45, 106, 79, 0.35);
+  }
+
+  &__icon {
+    font-size: 40px;
+    line-height: 1;
+    margin-top: 8px;
+    animation: floatSlow 4s ease-in-out infinite;
+  }
+
+  &:nth-child(2) &__icon {
+    animation-delay: 0.4s;
+  }
+
+  &:nth-child(3) &__icon {
+    animation-delay: 0.8s;
+  }
+
+  h3 {
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}

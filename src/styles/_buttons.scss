@@ -1,0 +1,107 @@
+// =========================================================
+//  BOTONES
+// =========================================================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  padding: 15px 32px;
+  font-size: 15.5px;
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease,
+    border-color 0.25s ease;
+
+  &--primary {
+    background: var(--green-600);
+    color: #fff;
+    box-shadow: 0 10px 26px -8px rgba(45, 106, 79, 0.5);
+
+    &:hover {
+      background: var(--green-700);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  &--light {
+    background: #fff;
+    color: var(--green-800);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+
+    &:hover {
+      color: var(--green-800);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+
+    &:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  &--outline {
+    background: transparent;
+    color: var(--green-700);
+    border: 1.5px solid var(--line-strong);
+
+    &:hover {
+      border-color: var(--green-600);
+      color: var(--green-700);
+    }
+  }
+
+  &--sm {
+    padding: 10px 22px;
+    font-size: 14px;
+  }
+
+  // Acción destructiva discreta: eliminar dentro de una tabla.
+  &--danger {
+    background: #fdecea;
+    color: #9a3324;
+    border: 1.5px solid #f3b4ac;
+
+    &:hover {
+      background: #f9d9d4;
+      color: #7d2a1d;
+    }
+  }
+
+  // Acción destructiva ya confirmada: el botón final del diálogo.
+  &--danger-solid {
+    background: #9a3324;
+    color: #fff;
+    border: 1.5px solid #9a3324;
+
+    &:hover {
+      background: #7d2a1d;
+      border-color: #7d2a1d;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}

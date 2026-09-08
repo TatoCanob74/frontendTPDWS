@@ -1,0 +1,46 @@
+// =========================================================
+//  BREAKPOINTS — estrategia mobile-first
+// =========================================================
+//
+// Todo el CSS de la app se escribe primero para pantalla chica: el bloque
+// base, sin ninguna media query, es el que ve un celular. Los mixins de acá
+// abajo van AGREGANDO lo que corresponde a medida que la pantalla crece, y
+// por eso todos usan `min-width` y nunca `max-width`.
+//
+// La diferencia no es cosmética. Con `max-width` el navegador de un celular
+// tiene que descargar y aplicar el layout de escritorio para después pisarlo,
+// mientras que con `min-width` directamente no evalúa esas reglas.
+//
+// Los tres breakpoints son los que pide la cátedra:
+//
+//   SM  480px   celular grande / phablet
+//   MD  768px   tablet en vertical
+//   LG  1024px  tablet en horizontal y escritorio
+//
+// Uso:
+//   .foo {
+//     grid-template-columns: 1fr;        // mobile
+//     @include md { grid-template-columns: 1fr 1fr; }
+//   }
+
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+@mixin sm {
+  @media (min-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
