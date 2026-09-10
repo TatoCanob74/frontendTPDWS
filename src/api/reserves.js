@@ -46,8 +46,13 @@ export function confirmPayment(idReserve, paymentId) {
   return client.post(`/reserves/${idReserve}/pago/confirmar`, { payment_id: paymentId }).then((r) => r.data)
 }
 
+/**
+ * Estado del pago + la reserva completa (cancha, horario y servicios), que es
+ * lo que necesitan las pantallas de retorno para mostrar el detalle sin tener
+ * que volver a pedir la reserva por separado.
+ */
 export function getPaymentStatus(idReserve) {
-  return client.get(`/reserves/${idReserve}/pago`).then((r) => r.data)
+  return client.get(`/reserves/${idReserve}/pago`).then((r) => Reserve.fromDTO(r.data))
 }
 
 /**

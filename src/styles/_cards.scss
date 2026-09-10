@@ -78,30 +78,16 @@
     }
   }
 
+  // Queda solo el botón (el precio salió: cada cancha tiene su propia tarifa),
+  // así que ocupa todo el ancho en vez de dejar media tarjeta vacía al lado.
   &__foot {
     margin-top: auto;
     padding-top: 14px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  &__price {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--green-600);
-
-    small {
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
-      font-size: 13px;
-      color: var(--muted-soft);
-    }
   }
 
   &__cta {
+    flex: 1;
     background: var(--green-600);
     color: #fff;
 

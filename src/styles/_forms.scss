@@ -193,6 +193,15 @@
     white-space: nowrap;
   }
 
+  // Precio del slot (o del servicio): el usuario tiene que poder comparar
+  // opciones sin entrar al checkout.
+  &__price {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green-700);
+    white-space: nowrap;
+  }
+
   &[aria-pressed='true'] {
     background: var(--green-600);
     border-color: var(--green-600);
@@ -200,6 +209,10 @@
 
     .slot__court {
       opacity: 0.9;
+    }
+
+    .slot__price {
+      color: #fff;
     }
   }
 
@@ -222,6 +235,42 @@
   }
 }
 
+// Lista de pares etiqueta/valor: el desglose del precio antes de pagar y el
+// detalle de la reserva en las pantallas de retorno del pago.
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface-in);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  &__value {
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  // Fila de cierre (el total): se separa con una línea y pesa más.
+  &__row--total {
+    border-top: 1px solid var(--line);
+    padding-top: 8px;
+    margin-top: 2px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+}
+
 .summary {
   display: flex;
   flex-direction: column;
@@ -236,6 +285,14 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 16px;
+
+    // El total es el dato que más se busca en esta pantalla: va más grande y
+    // en el verde de marca para destacarlo junto al botón de pago.
+    &--total {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-700);
+    }
   }
 }
 

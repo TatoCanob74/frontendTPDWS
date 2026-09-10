@@ -1,4 +1,5 @@
 import { Horary } from './Horary.js'
+import { formatCurrency } from '../utils/currency.js'
 
 /** Tipos de cancha del enum del backend, con su etiqueta e ícono para la UI. */
 export const COURT_TYPES = [
@@ -6,12 +7,6 @@ export const COURT_TYPES = [
   { value: 'TENIS', label: 'Tenis', icon: '🎾' },
   { value: 'PADEL', label: 'Pádel', icon: '🏓' }
 ]
-
-const currency = new Intl.NumberFormat('es-AR', {
-  style: 'currency',
-  currency: 'ARS',
-  maximumFractionDigits: 0
-})
 
 /**
  * Cancha.
@@ -66,7 +61,7 @@ export class Court {
 
   /** "28000.00" → "$28.000" */
   get formattedPrice() {
-    return currency.format(Number(this.hourlyPrice))
+    return formatCurrency(this.hourlyPrice)
   }
 
   /** Nombre de la sede, si el backend lo incluyó en la respuesta. */
@@ -77,12 +72,16 @@ export class Court {
   /**
    * Horarios de esta cancha para un día concreto ('Lunes', 'Martes', …).
    * Se les adjunta el nombre de la cancha para poder distinguir en pantalla dos
-   * franjas de la misma hora pertenecientes a canchas diferentes.
+   * franjas de la misma hora pertenecientes a canchas diferentes, y el precio
+   * por hora para que el formulario de reserva pueda mostrar el total antes de
+   * mandar al usuario a pagar.
    */
   horariesForDay(day) {
     return this.horaries
       .filter((h) => h.day === day)
-      .map((h) => Horary.fromDTO({ ...h, courtName: this.nameCourt }))
+      .map((h) =>
+        Horary.fromDTO({ ...h, courtName: this.nameCourt, hourlyPrice: this.hourlyPrice })
+      )
   }
 
   /** Los campos que espera el backend al crear o editar. Nunca manda el id. */

@@ -59,6 +59,10 @@ export function deleteCourt(idCourt) {
  * razona en términos de deporte + sede. Como `/canchas/verCanchas` ya devuelve
  * cada cancha con sus horarios anidados, se resuelve con una sola llamada y el
  * filtro por día se hace acá.
+ *
+ * El formulario de reserva ya no la usa (se trae las canchas del deporte una
+ * sola vez y filtra en memoria, para poder avisar qué sedes y qué días tienen
+ * disponibilidad); se mantiene para consultas puntuales de un solo día.
  */
 export function getHorarios({ typeCourt, idLocateCourt, day }) {
   return getCourts({ typeCourt, idLocateCourt }).then((courts) =>

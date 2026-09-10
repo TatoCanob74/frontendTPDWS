@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-export default function SportCard({ sport, icon, name, desc, feats, price, className = '' }) {
+export default function SportCard({ sport, icon, name, desc, feats, className = '' }) {
   return (
     <article className={`card card--${sport} ${className}`} data-reveal>
       <div className="card__icon" aria-hidden="true">{icon}</div>
@@ -12,7 +12,9 @@ export default function SportCard({ sport, icon, name, desc, feats, price, class
         ))}
       </ul>
       <div className="card__foot">
-        <span className="card__price">{price}<small> / hora</small></span>
+        {/* Sin precio: cada cancha tiene su propia tarifa por hora, así que un
+            número fijo acá desinformaba. El precio real se ve al elegir el
+            horario en el formulario de reserva. */}
         <Link className="btn btn--sm card__cta" to={`/canchas?deporte=${sport}`}>Reservar</Link>
       </div>
     </article>

@@ -1,8 +1,4 @@
-const currency = new Intl.NumberFormat('es-AR', {
-  style: 'currency',
-  currency: 'ARS',
-  maximumFractionDigits: 0
-})
+import { formatCurrency } from '../utils/currency.js'
 
 /**
  * Servicio adicional (ofrecido junto con la reserva de una cancha).
@@ -26,7 +22,7 @@ export class Service {
 
   /** "5000" → "$5.000" */
   get formattedPrice() {
-    return currency.format(Number(this.priceService))
+    return formatCurrency(this.priceService)
   }
 
   /** Los campos que espera el backend al crear o editar. Nunca manda el id. */

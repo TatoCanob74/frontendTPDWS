@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { getHorarios, getLocations } from '../../api/courts'
+import { getCourts, getLocations } from '../../api/courts'
 import { getServices } from '../../api/services'
 import { createReserve, createPaymentPreference } from '../../api/reserves'
-import { SHIFTS } from '../../models/Horary'
+import { DAYS, SHIFTS } from '../../models/Horary'
+import { formatCurrency } from '../../utils/currency'
 
 const SPORTS = [
   { value: 'futbol', label: 'Fútbol', icon: '⚽' },
@@ -18,9 +19,14 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10)
 }
 
+/**
+ * '2026-09-10' → 'Jueves'. Devuelve null si la fecha está vacía o es inválida:
+ * el input date se puede borrar, y entonces `new Date()` da Invalid Date.
+ */
 function dayOfWeek(isoDate) {
+  if (!isoDate) return null
   const d = new Date(`${isoDate}T12:00:00`)
-  return DAY_BY_INDEX[d.getDay()]
+  return Number.isNaN(d.getTime()) ? null : DAY_BY_INDEX[d.getDay()]
 }
 
 export default function BookingForm() {
@@ -42,16 +48,20 @@ export default function BookingForm() {
   const [locationsError, setLocationsError] = useState(false)
   const [services, setServices] = useState([])
 
-  // Se guarda junto con la "clave" del pedido que la originó, para poder derivar
-  // el estado de carga comparando esa clave contra la selección actual (sin
-  // necesidad de resetear nada manualmente dentro del efecto).
-  const [horariosResult, setHorariosResult] = useState({ key: null, data: [], error: false })
+  // Canchas del deporte elegido, con sus horarios anidados. Se guarda junto con
+  // la "clave" del pedido que la originó, para poder derivar el estado de carga
+  // comparando esa clave contra la selección actual (sin necesidad de resetear
+  // nada manualmente dentro del efecto).
+  //
+  // Se piden por deporte y no por deporte+sede+fecha: las canchas no cambian al
+  // mover la fecha, y teniendo todas en memoria se puede avisar QUÉ sedes y QUÉ
+  // días tienen disponibilidad en lugar de mostrar una grilla vacía.
+  const [courtsResult, setCourtsResult] = useState({ key: null, data: [], error: false })
 
   const [status, setStatus] = useState(null) // { type: 'error' | 'success', message }
   const [submitting, setSubmitting] = useState(false)
 
   const day = useMemo(() => dayOfWeek(date), [date])
-  const horariosKey = sport && idLocateCourt && date ? `${sport}|${idLocateCourt}|${date}` : null
 
   useEffect(() => {
     getLocations()
@@ -63,23 +73,65 @@ export default function BookingForm() {
   }, [])
 
   useEffect(() => {
-    if (!horariosKey) return
     let ignore = false
-    getHorarios({ typeCourt: sport.toUpperCase(), idLocateCourt, day })
+    getCourts({ typeCourt: sport.toUpperCase() })
       .then((data) => {
-        if (!ignore) setHorariosResult({ key: horariosKey, data, error: false })
+        if (!ignore) setCourtsResult({ key: sport, data, error: false })
       })
       .catch(() => {
-        if (!ignore) setHorariosResult({ key: horariosKey, data: [], error: true })
+        if (!ignore) setCourtsResult({ key: sport, data: [], error: true })
       })
     return () => {
       ignore = true
     }
-  }, [horariosKey, sport, idLocateCourt, day])
+  }, [sport])
 
-  const horariosLoading = Boolean(horariosKey) && horariosResult.key !== horariosKey
-  const horarios = horariosResult.key === horariosKey ? horariosResult.data : []
-  const horariosError = horariosResult.key === horariosKey && horariosResult.error
+  const courtsLoading = courtsResult.key !== sport
+  const courtsError = courtsResult.key === sport && courtsResult.error
+
+  // Memoizado para no devolver un `[]` nuevo en cada render: de él cuelgan
+  // todos los valores derivados de abajo.
+  const courts = useMemo(
+    () => (courtsResult.key === sport ? courtsResult.data : []),
+    [courtsResult, sport]
+  )
+
+  const sportLabel = SPORTS.find((s) => s.value === sport)?.label.toLowerCase() ?? sport
+
+  /** ¿Esa sede tiene canchas del deporte elegido? */
+  const locationHasSport = useCallback(
+    (idLocation) => courts.some((c) => String(c.idLocateCourt) === String(idLocation)),
+    [courts]
+  )
+
+  const courtsInLocation = useMemo(
+    () => courts.filter((c) => String(c.idLocateCourt) === String(idLocateCourt)),
+    [courts, idLocateCourt]
+  )
+
+  const horarios = useMemo(
+    () => (day ? courtsInLocation.flatMap((c) => c.horariesForDay(day)) : []),
+    [courtsInLocation, day]
+  )
+
+  // Días de la semana con al menos un horario en esa sede. Sin esto, caer en un
+  // día sin cobertura es un callejón sin salida: la grilla queda vacía y no hay
+  // forma de saber qué otro día probar.
+  const daysWithSlots = useMemo(
+    () => DAYS.filter((d) => courtsInLocation.some((c) => c.horariesForDay(d).length > 0)),
+    [courtsInLocation]
+  )
+
+  // Sedes que sí tienen canchas de este deporte, para sugerirlas cuando la
+  // elegida no tiene ninguna.
+  const locationsWithSport = useMemo(
+    () => locations.filter((loc) => locationHasSport(loc.idLocation)),
+    [locations, locationHasSport]
+  )
+
+  // Hay una respuesta cargada y una selección completa: recién ahí tiene sentido
+  // explicar por qué la grilla está vacía.
+  const ready = Boolean(idLocateCourt) && Boolean(day) && !courtsLoading && !courtsError
 
   const visibleHorarios = horarios.filter((h) => h.matchesShift(shift))
 
@@ -88,6 +140,23 @@ export default function BookingForm() {
   // después, cualquier llamada durante el render rompía con
   // "Cannot access 'selectedHorario' before initialization".
   const selectedHorario = horarios.find((h) => h.idHorary === idHorary)
+
+  // Detalle de precios. Replica el cálculo del backend (reserveController:
+  // `totalAmount = hourlyPrice + Σ priceService`) para poder mostrar el importe
+  // final ANTES de crear la reserva: hasta ahora el usuario recién lo veía en
+  // Mercado Pago, con la reserva ya generada.
+  const chosenServices = useMemo(
+    () => services.filter((s) => selectedServices.includes(s.idService)),
+    [services, selectedServices]
+  )
+
+  const total = useMemo(() => {
+    if (!selectedHorario || selectedHorario.hourlyPrice == null) return null
+    return chosenServices.reduce(
+      (acc, s) => acc + Number(s.priceService),
+      Number(selectedHorario.hourlyPrice)
+    )
+  }, [selectedHorario, chosenServices])
 
   /** Alterna la franja. Volver a tocar la franja activa vuelve a "todas". */
   function toggleShift(value) {
@@ -130,8 +199,26 @@ export default function BookingForm() {
         idHorary: selectedHorario.idHorary,
         services: selectedServices
       })
-      const { init_point } = await createPaymentPreference(reserve.idReserve)
-      window.location.assign(init_point)
+      const { init_point, autoReturn } = await createPaymentPreference(reserve.idReserve)
+
+      if (autoReturn) {
+        // MercadoPago devuelve al usuario solo a /pago/exito|error|pendiente.
+        window.location.assign(init_point)
+        return
+      }
+
+      // Sin back_urls (pasa siempre que el front no esté publicado por https)
+      // MercadoPago deja al usuario en su pantalla final, sin forma de volver.
+      // Se abre el checkout en otra pestaña y esta queda esperando el resultado,
+      // así el usuario termina de vuelta en CanchaYa igual.
+      const checkout = window.open(init_point, '_blank')
+      if (!checkout) {
+        // Pestaña bloqueada por el navegador: mejor ir al checkout que quedarse.
+        window.location.assign(init_point)
+        return
+      }
+      checkout.opener = null
+      navigate(`/pago/pendiente?reserva=${reserve.idReserve}&esperando=1`)
     } catch (err) {
       setStatus({
         type: 'error',
@@ -178,9 +265,18 @@ export default function BookingForm() {
             onChange={(e) => setIdLocateCourt(e.target.value)}
           >
             <option value="">Elegí una sede</option>
-            {locations.map((loc) => (
-              <option key={loc.idLocation} value={loc.idLocation}>{loc.nomLocation}</option>
-            ))}
+            {locations.map((loc) => {
+              // No se deshabilitan: si la sede no tiene el deporte hay que poder
+              // elegirla igual para leer el motivo, en vez de que la opción
+              // desaparezca sin explicación.
+              const hasSport = courtsLoading || locationHasSport(loc.idLocation)
+              return (
+                <option key={loc.idLocation} value={loc.idLocation}>
+                  {loc.nomLocation}
+                  {hasSport ? '' : ` — sin canchas de ${sportLabel}`}
+                </option>
+              )
+            })}
           </select>
           {locationsError && <p className="hint">Las sedes todavía no están disponibles.</p>}
         </div>
@@ -198,7 +294,9 @@ export default function BookingForm() {
       </div>
 
       <div className="field">
-        <span className="field__label" id="lbl-horario">Horario ({day})</span>
+        <span className="field__label" id="lbl-horario">
+          Horario{day ? ` (${day})` : ''}
+        </span>
 
         <div className="sports-tabs" role="group" aria-label="Filtrar por turno">
           <button type="button" className="chip" aria-pressed={shift === ''} onClick={() => setShift('')}>
@@ -224,23 +322,38 @@ export default function BookingForm() {
               type="button"
               className="chip slot"
               aria-pressed={idHorary === h.idHorary}
-              aria-label={h.courtName ? `${h.start}, ${h.courtName}` : h.start}
+              aria-label={[h.start, h.courtName, h.formattedPrice].filter(Boolean).join(', ')}
               onClick={() => setIdHorary(h.idHorary)}
             >
               {h.start}
               {h.courtName && <small className="slot__court">{h.courtName}</small>}
+              {h.formattedPrice && <small className="slot__price">{h.formattedPrice}</small>}
             </button>
           ))}
         </div>
         {!idLocateCourt && <p className="hint">Elegí una sede para ver los horarios.</p>}
-        {idLocateCourt && horariosLoading && <p className="hint">Buscando horarios…</p>}
-        {idLocateCourt && !horariosLoading && horariosError && (
+        {idLocateCourt && !day && <p className="hint">Elegí una fecha para ver los horarios.</p>}
+        {idLocateCourt && day && courtsLoading && <p className="hint">Buscando horarios…</p>}
+        {idLocateCourt && day && !courtsLoading && courtsError && (
           <p className="hint">Los horarios todavía no están disponibles.</p>
         )}
-        {idLocateCourt && !horariosLoading && !horariosError && horarios.length === 0 && (
-          <p className="hint">No hay horarios para ese deporte, sede y día.</p>
+
+        {/* Los tres casos vacíos se explican por separado: "no hay nada" a secas
+            deja al usuario probando combinaciones a ciegas. */}
+        {ready && courtsInLocation.length === 0 && (
+          <p className="hint">
+            {`Esta sede no tiene canchas de ${sportLabel}.`}
+            {locationsWithSport.length > 0 &&
+              ` Sí hay en: ${locationsWithSport.map((l) => l.nomLocation).join(', ')}.`}
+          </p>
         )}
-        {idLocateCourt && !horariosLoading && !horariosError && horarios.length > 0 && visibleHorarios.length === 0 && (
+        {ready && courtsInLocation.length > 0 && horarios.length === 0 && (
+          <p className="hint">
+            {`No hay horarios de ${sportLabel} en esta sede los ${day.toLowerCase()}.`}
+            {daysWithSlots.length > 0 && ` Días con turnos: ${daysWithSlots.join(', ')}.`}
+          </p>
+        )}
+        {ready && horarios.length > 0 && visibleHorarios.length === 0 && (
           <p className="hint">No hay horarios en ese turno. Probá con otro.</p>
         )}
         {visibleHorarios.length > 0 && (
@@ -258,10 +371,34 @@ export default function BookingForm() {
                 type="button"
                 className="chip slot"
                 aria-pressed={selectedServices.includes(s.idService)}
+                aria-label={`${s.nameService}, ${s.formattedPrice}`}
                 onClick={() => toggleService(s.idService)}
               >
                 {s.nameService}
+                <small className="slot__price">+{s.formattedPrice}</small>
               </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {total !== null && (
+        <div className="field">
+          <span className="field__label" id="lbl-detalle">Detalle</span>
+          <div className="detail-list" aria-labelledby="lbl-detalle">
+            <div className="detail-list__row">
+              <span>
+                Cancha{selectedHorario.courtName ? ` · ${selectedHorario.courtName}` : ''}
+                {' · '}
+                {selectedHorario.label}
+              </span>
+              <span className="detail-list__value">{selectedHorario.formattedPrice}</span>
+            </div>
+            {chosenServices.map((s) => (
+              <div className="detail-list__row" key={s.idService}>
+                <span>{s.nameService}</span>
+                <span className="detail-list__value">{s.formattedPrice}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -271,10 +408,16 @@ export default function BookingForm() {
         <div className="summary">
           <span className="summary__label">Tu reserva</span>
           <span className="summary__value">
-            {SPORTS.find((s) => s.value === sport)?.label} · {date} · {day}
+            {[SPORTS.find((s) => s.value === sport)?.label, date, day].filter(Boolean).join(' · ')}
             {selectedHorario
               ? ` · ${selectedHorario.label}${selectedHorario.courtName ? ` · ${selectedHorario.courtName}` : ''}`
               : ' · elegí un horario'}
+          </span>
+        </div>
+        <div className="summary summary--total">
+          <span className="summary__label">Total a pagar</span>
+          <span className="summary__value summary__value--total">
+            {total !== null ? formatCurrency(total) : '—'}
           </span>
         </div>
         <button className="btn btn--primary" type="submit" disabled={submitting}>

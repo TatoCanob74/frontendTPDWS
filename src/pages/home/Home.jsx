@@ -10,24 +10,21 @@ const SPORTS = [
     icon: '⚽',
     name: 'Fútbol',
     desc: 'Canchas de fútbol 5 y 7 con césped sintético de última generación.',
-    feats: ['Césped sintético FIFA Quality', 'Iluminación LED nocturna'],
-    price: '$28.000'
+    feats: ['Césped sintético FIFA Quality', 'Iluminación LED nocturna']
   },
   {
     sport: 'tenis',
     icon: '🎾',
     name: 'Tenis',
     desc: 'Polvo de ladrillo y superficie rápida, mantenidas a diario.',
-    feats: ['Polvo de ladrillo profesional', 'Alquiler de raquetas'],
-    price: '$18.000'
+    feats: ['Polvo de ladrillo profesional', 'Alquiler de raquetas']
   },
   {
     sport: 'padel',
     icon: '🏓',
     name: 'Pádel',
     desc: 'Canchas panorámicas de cristal templado, techadas y climatizadas.',
-    feats: ['Paredes de cristal panorámicas', 'Techadas: jugá con lluvia'],
-    price: '$22.000'
+    feats: ['Paredes de cristal panorámicas', 'Techadas: jugá con lluvia']
   }
 ]
 

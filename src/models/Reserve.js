@@ -1,5 +1,6 @@
 import { Court } from './Court.js'
 import { Horary } from './Horary.js'
+import { formatCurrency } from '../utils/currency.js'
 
 /** Estados de pago que devuelve MercadoPago, con su texto para la UI. */
 const PAYMENT_LABELS = {
@@ -13,12 +14,6 @@ const PAYMENT_LABELS = {
   refunded: 'Pago devuelto',
   charged_back: 'Pago con contracargo'
 }
-
-const currency = new Intl.NumberFormat('es-AR', {
-  style: 'currency',
-  currency: 'ARS',
-  maximumFractionDigits: 0
-})
 
 /**
  * Reserva.
@@ -65,7 +60,7 @@ export class Reserve {
   }
 
   get formattedAmount() {
-    return currency.format(Number(this.totalAmount))
+    return formatCurrency(this.totalAmount)
   }
 
   get isPending() {

@@ -5,6 +5,8 @@
  * como un string del enum ('Lunes', 'Martes', …). Esta clase se encarga de
  * presentarlos, para que las pantallas no tengan que recortar strings a mano.
  */
+import { formatCurrency } from '../utils/currency.js'
+
 /** Dias del enum del backend. El orden y los acentos tienen que coincidir exacto. */
 export const DAYS = [
   'Lunes',
@@ -36,7 +38,7 @@ export function findShift(value) {
 }
 
 export class Horary {
-  constructor({ idHorary, idCourt, startTime, endTime, day, courtName = null }) {
+  constructor({ idHorary, idCourt, startTime, endTime, day, courtName = null, hourlyPrice = null }) {
     this.idHorary = idHorary
     this.idCourt = idCourt
     this.startTime = startTime
@@ -47,6 +49,10 @@ export class Horary {
     // Court.horariesForDay): en un mismo día y sede puede haber dos franjas de
     // "10:00" de canchas distintas, y sin esto son indistinguibles en pantalla.
     this.courtName = courtName
+    // Precio por hora de esa cancha, para poder mostrar el costo de la reserva
+    // antes de confirmarla. Lo completa la misma factory que `courtName`;
+    // `GET /horarios` a secas no lo trae.
+    this.hourlyPrice = hourlyPrice
   }
 
   /** Factory Method: construye una instancia desde la respuesta cruda del backend. */
@@ -74,6 +80,11 @@ export class Horary {
   /** "18:00 - 19:00" */
   get label() {
     return `${this.start} - ${this.end}`
+  }
+
+  /** "28000.00" → "$28.000". Cadena vacía si el horario vino sin precio. */
+  get formattedPrice() {
+    return this.hourlyPrice == null ? '' : formatCurrency(this.hourlyPrice)
   }
 
   /** ¿Empieza dentro de la franja? Sin franja ('' o desconocida) entra siempre. */
