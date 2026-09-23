@@ -1,12 +1,6 @@
 import { client, emptyOn404 } from './client'
 import { Location } from '../models/Location'
 
-// Rutas reales del backend:
-//   GET    /localidades      listado                    (público)
-//   POST   /localidades      crear                       (admin)
-//   PUT    /localidades/:id  editar                      (admin)
-//   DELETE /localidades/:id  eliminar                     (admin)
-
 export function getLocations() {
   return emptyOn404(client.get('/localidades').then((r) => r.data)).then(Location.fromList)
 }

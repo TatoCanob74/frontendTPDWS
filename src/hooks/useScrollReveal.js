@@ -1,7 +1,5 @@
 import { useEffect } from 'react'
 
-// Port de initReveal(): agrega .is-visible a [data-reveal] cuando entra al viewport.
-// El hero se anima al montar, no al scrollear.
 export function useScrollReveal(scope) {
   useEffect(() => {
     const root = scope?.current ?? document

@@ -24,9 +24,6 @@ export default function Register() {
   const [form, setForm] = useState(initialForm)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
-
-  // Error de la fecha de nacimiento: se muestra debajo del campo, no arriba de
-  // todo, para que se vea a qué input corresponde.
   const [dateError, setDateError] = useState(null)
 
   function handleChange(e) {
@@ -34,7 +31,6 @@ export default function Register() {
     if (e.target.name === 'dateUser') setDateError(null)
   }
 
-  /** Valida al salir del campo, así el aviso llega antes de apretar "Crear cuenta". */
   function handleDateBlur() {
     setDateError(form.dateUser ? validateBirthDate(form.dateUser) : null)
   }
@@ -43,8 +39,6 @@ export default function Register() {
     e.preventDefault()
     setError(null)
 
-    // El backend valida lo mismo y responde 400, pero avisar acá evita el viaje
-    // de ida y vuelta y deja el mensaje pegado al campo que hay que corregir.
     const birthDateError = validateBirthDate(form.dateUser)
     if (birthDateError) {
       setDateError(birthDateError)

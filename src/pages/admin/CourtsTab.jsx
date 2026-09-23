@@ -10,20 +10,15 @@ import {
 import CourtForm from '../../components/courtForm/CourtForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
-/** ABM de canchas: listar, crear, editar, habilitar/deshabilitar y eliminar. */
 export default function CourtsTab() {
   const [courts, setCourts] = useState([])
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
-
-  // null = no se está editando nada; una Court = edición; 'new' = alta
   const [editing, setEditing] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState(null)
-
-  // Cancha pendiente de confirmación de borrado (null = diálogo cerrado)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -80,7 +75,6 @@ export default function CourtsTab() {
     }
   }
 
-  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Eliminar". */
   async function handleDeleteConfirmed() {
     if (!confirmingDelete) return
 
@@ -91,7 +85,6 @@ export default function CourtsTab() {
       setNotice('Cancha eliminada correctamente.')
       await loadCourts()
     } catch (err) {
-      // El backend responde 409 si la cancha tiene horarios asociados
       setError(messageFrom(err, 'No pudimos eliminar la cancha.'))
     } finally {
       setDeleting(false)

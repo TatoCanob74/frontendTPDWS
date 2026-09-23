@@ -21,8 +21,6 @@ import BookingForm from './BookingForm'
 import { getLocations, getCourts } from '../../api/courts'
 import { getServices } from '../../api/services'
 
-// Forma real de `GET /canchas/verCanchas?typeCourt=FUTBOL`: los horarios vienen
-// anidados bajo "Horarios" y el precio por hora como string decimal.
 const CAMPUS_ROSARIO = {
   idCourt: 1,
   typeCourt: 'FUTBOL',
@@ -49,7 +47,6 @@ beforeEach(() => {
   getServices.mockResolvedValue(
     Service.fromList([{ idService: 1, nameService: 'Parrilla', priceService: '3000.00' }])
   )
-  // Solo hay canchas de fútbol, y solo en Rosario.
   getCourts.mockImplementation(({ typeCourt }) =>
     Promise.resolve(typeCourt === 'FUTBOL' ? Court.fromList([CAMPUS_ROSARIO]) : [])
   )
@@ -63,7 +60,6 @@ function renderForm() {
   )
 }
 
-/** Elige sede y fecha, que es el punto de partida de casi todos los casos. */
 async function pick(user, { sede, fecha }) {
   await screen.findByRole('option', { name: /Rosario/ })
   await user.selectOptions(screen.getByLabelText('Sede'), sede)
@@ -75,7 +71,7 @@ describe('BookingForm', () => {
   it('lista los horarios del día con su precio', async () => {
     const user = userEvent.setup()
     renderForm()
-    await pick(user, { sede: '1', fecha: '2026-09-10' }) // jueves
+    await pick(user, { sede: '1', fecha: '2026-09-10' })  // jueves
 
     const slot = await screen.findByRole('button', { name: /19:00/ })
     expect(slot).toHaveTextContent('Campus Rosario')
@@ -98,7 +94,7 @@ describe('BookingForm', () => {
   it('cuando el día elegido no tiene turnos, dice cuáles sí los tienen', async () => {
     const user = userEvent.setup()
     renderForm()
-    await pick(user, { sede: '1', fecha: '2026-09-09' }) // miércoles: sin turnos
+    await pick(user, { sede: '1', fecha: '2026-09-09' })
 
     const hint = await screen.findByText(/No hay horarios de fútbol/)
     expect(hint).toHaveTextContent('Días con turnos: Martes, Jueves')
@@ -107,7 +103,7 @@ describe('BookingForm', () => {
   it('cuando la sede no tiene el deporte, sugiere las sedes que sí lo tienen', async () => {
     const user = userEvent.setup()
     renderForm()
-    await pick(user, { sede: '3', fecha: '2026-09-10' }) // Cordoba: sin fútbol
+    await pick(user, { sede: '3', fecha: '2026-09-10' })
 
     const hint = await screen.findByText(/Esta sede no tiene canchas de fútbol/)
     expect(hint).toHaveTextContent('Sí hay en: Rosario')

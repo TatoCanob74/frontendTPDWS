@@ -1,15 +1,11 @@
+// Contenedores y espaciado de secciones
 @use 'mixins' as *;
 
-// =========================================================
-//  UTILIDADES DE LAYOUT
-// =========================================================
 .shell {
   width: 100%;
   max-width: var(--shell);
   margin-inline: auto;
 
-  // El respiro lateral crece con la pantalla: pegado a los bordes en mobile,
-  // más holgado cuando el contenido ya alcanzó su ancho máximo.
   padding-inline: 20px;
 
   @include md {
@@ -24,8 +20,6 @@
 .page {
   padding-bottom: 96px;
 
-  // La barra de navegación es fija: el padding superior evita que tape el
-  // contenido, y en mobile la barra es más baja.
   padding-top: 104px;
 
   @include md {
@@ -33,8 +27,6 @@
   }
 }
 
-// El aire vertical de una sección: en mobile menos, porque la pantalla es
-// corta y un padding grande deja al usuario mirando espacio vacío.
 .section {
   padding-block: 72px;
 

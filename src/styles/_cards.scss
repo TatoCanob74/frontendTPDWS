@@ -1,8 +1,4 @@
-// =========================================================
-//  DEPORTES
-// =========================================================
-// El grid es fluido con auto-fit: pasa solo de 1 a 2 y a 3 columnas según el
-// ancho disponible, sin necesidad de media queries.
+// Tarjetas de deportes
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -78,8 +74,6 @@
     }
   }
 
-  // Queda solo el botón (el precio salió: cada cancha tiene su propia tarifa),
-  // así que ocupa todo el ancho en vez de dejar media tarjeta vacía al lado.
   &__foot {
     margin-top: auto;
     padding-top: 14px;
@@ -98,9 +92,6 @@
   }
 }
 
-// =========================================================
-//  CÓMO FUNCIONA
-// =========================================================
 .steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

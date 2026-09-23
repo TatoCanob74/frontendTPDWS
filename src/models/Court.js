@@ -1,19 +1,12 @@
 import { Horary } from './Horary.js'
 import { formatCurrency } from '../utils/currency.js'
 
-/** Tipos de cancha del enum del backend, con su etiqueta e ícono para la UI. */
 export const COURT_TYPES = [
   { value: 'FUTBOL', label: 'Fútbol', icon: '⚽' },
   { value: 'TENIS', label: 'Tenis', icon: '🎾' },
   { value: 'PADEL', label: 'Pádel', icon: '🏓' }
 ]
 
-/**
- * Cancha.
- *
- * `GET /canchas/verCanchas` devuelve cada cancha con sus horarios anidados bajo
- * la clave "Horarios" (el alias de la asociación en el backend).
- */
 export class Court {
   constructor({
     idCourt,
@@ -37,7 +30,6 @@ export class Court {
     this.location = Localidad
   }
 
-  /** Factory Method: construye una instancia desde la respuesta cruda del backend. */
   static fromDTO(dto) {
     return new Court(dto)
   }
@@ -50,7 +42,6 @@ export class Court {
     return this.stateCourt === 'DISPONIBLE'
   }
 
-  /** "FUTBOL" → "Fútbol" */
   get typeLabel() {
     return COURT_TYPES.find((t) => t.value === this.typeCourt)?.label ?? this.typeCourt
   }
@@ -59,23 +50,14 @@ export class Court {
     return COURT_TYPES.find((t) => t.value === this.typeCourt)?.icon ?? ''
   }
 
-  /** "28000.00" → "$28.000" */
   get formattedPrice() {
     return formatCurrency(this.hourlyPrice)
   }
 
-  /** Nombre de la sede, si el backend lo incluyó en la respuesta. */
   get locationName() {
     return this.location?.nomLocation ?? null
   }
 
-  /**
-   * Horarios de esta cancha para un día concreto ('Lunes', 'Martes', …).
-   * Se les adjunta el nombre de la cancha para poder distinguir en pantalla dos
-   * franjas de la misma hora pertenecientes a canchas diferentes, y el precio
-   * por hora para que el formulario de reserva pueda mostrar el total antes de
-   * mandar al usuario a pagar.
-   */
   horariesForDay(day) {
     return this.horaries
       .filter((h) => h.day === day)
@@ -84,7 +66,6 @@ export class Court {
       )
   }
 
-  /** Los campos que espera el backend al crear o editar. Nunca manda el id. */
   toPayload() {
     return {
       typeCourt: this.typeCourt,

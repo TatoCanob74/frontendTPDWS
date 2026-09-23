@@ -3,15 +3,11 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { usePaymentReturn } from '../../hooks/usePaymentReturn'
 import ReserveDetail from '../../components/reserveDetail/ReserveDetail'
 
-// Cuánto queda la confirmación en pantalla antes de pasar a "Mis reservas".
-// Más largo que el resto de los casos: acá hay un detalle para leer.
 const CONFIRMED_DELAY_MS = 8000
 const REDIRECT_DELAY_MS = 5000
 
 export default function PagoPendiente() {
   const [params] = useSearchParams()
-  // `esperando=1` lo pone el formulario de reserva cuando abrió el checkout en
-  // otra pestaña porque MercadoPago no podía devolver al usuario por su cuenta.
   const waiting = params.get('esperando') === '1'
 
   const { loading, reserve, error, settled } = usePaymentReturn({ poll: waiting })
@@ -21,9 +17,6 @@ export default function PagoPendiente() {
 
   useEffect(() => {
     if (loading) return
-    // Mientras se espera el pago de la otra pestaña no hay que moverse: irse a
-    // "Mis reservas" dejaría al usuario mirando una reserva pendiente en vez
-    // del resultado.
     if (waiting && !settled) return
 
     const timer = setTimeout(
@@ -59,8 +52,6 @@ export default function PagoPendiente() {
         {!loading && error && <div className="alert alert--error">{error}</div>}
 
         {!loading && reserve && (
-          // El rojo se reserva para un rechazo real: mientras el pago sigue en
-          // curso, "pendiente" es información, no un error.
           <div className={`alert ${confirmed || !settled ? '' : 'alert--error'}`}>
             {confirmed
               ? 'Pago aprobado · Reserva confirmada'

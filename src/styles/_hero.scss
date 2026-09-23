@@ -1,8 +1,6 @@
+// Hero del home
 @use 'mixins' as *;
 
-// =========================================================
-//  HERO
-// =========================================================
 .hero {
   position: relative;
   display: grid;
@@ -15,8 +13,6 @@
     var(--green-600) 100%
   );
 
-  // En mobile el alto lo define el contenido: forzar 92vh dejaba la sección
-  // siguiente fuera de vista y parecía que la página terminaba ahí.
   min-height: auto;
   padding: 120px 20px 72px;
 
@@ -150,8 +146,6 @@
     color: rgba(255, 255, 255, 0.6);
   }
 
-  // El separador vertical solo tiene sentido cuando las métricas están en
-  // una fila; en mobile bajan de línea y quedaría cruzado.
   &__sep {
     display: none;
     width: 1px;

@@ -9,11 +9,7 @@ export default function Reservas() {
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [cancellingId, setCancellingId] = useState(null)
-
-  // idReserve cuyo link de pago se está generando (null = ninguno)
   const [payingId, setPayingId] = useState(null)
-
-  // Reserva pendiente de confirmación de cancelación (null = diálogo cerrado)
   const [confirmingCancel, setConfirmingCancel] = useState(null)
 
   const load = useCallback(() => {
@@ -26,17 +22,13 @@ export default function Reservas() {
   }, [])
 
   useEffect(() => {
-    // Un pago aprobado puede no haber quedado registrado todavía: pasa si el
-    // usuario cerró la pestaña de MercadoPago antes de volver, o si el webhook
-    // no llega (backend en localhost). Se sincroniza antes de listar para que la
-    // reserva aparezca con el estado real y no "pendiente" para siempre.
+    // Puede haber pagos aprobados que el webhook todavía no registró
     syncPayments()
       .catch(() => null)
       .then(load)
       .finally(() => setLoading(false))
   }, [load])
 
-  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Cancelar". */
   async function handleCancelConfirmed() {
     const reserve = confirmingCancel
     if (!reserve) return
@@ -50,14 +42,12 @@ export default function Reservas() {
       setNotice('Reserva cancelada correctamente.')
       await load()
     } catch (err) {
-      // El backend rechaza con 400 si faltan menos de 6 horas o si no está pendiente
       setError(err.response?.data?.error || 'No pudimos cancelar la reserva.')
     } finally {
       setCancellingId(null)
     }
   }
 
-  /** Retoma el pago de una reserva que quedó pendiente. */
   async function handlePay(reserve) {
     setPayingId(reserve.idReserve)
     setNotice(null)

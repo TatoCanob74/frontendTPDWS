@@ -19,10 +19,6 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10)
 }
 
-/**
- * '2026-09-10' → 'Jueves'. Devuelve null si la fecha está vacía o es inválida:
- * el input date se puede borrar, y entonces `new Date()` da Invalid Date.
- */
 function dayOfWeek(isoDate) {
   if (!isoDate) return null
   const d = new Date(`${isoDate}T12:00:00`)
@@ -39,26 +35,12 @@ export default function BookingForm() {
   const [idLocateCourt, setIdLocateCourt] = useState('')
   const [idHorary, setIdHorary] = useState(null)
   const [selectedServices, setSelectedServices] = useState([])
-
-  // Franja horaria del filtro ('' = todas). Una sede con varias canchas devuelve
-  // decenas de horarios para un mismo día; sin filtro son inelegibles a ojo.
   const [shift, setShift] = useState('')
-
   const [locations, setLocations] = useState([])
   const [locationsError, setLocationsError] = useState(false)
   const [services, setServices] = useState([])
-
-  // Canchas del deporte elegido, con sus horarios anidados. Se guarda junto con
-  // la "clave" del pedido que la originó, para poder derivar el estado de carga
-  // comparando esa clave contra la selección actual (sin necesidad de resetear
-  // nada manualmente dentro del efecto).
-  //
-  // Se piden por deporte y no por deporte+sede+fecha: las canchas no cambian al
-  // mover la fecha, y teniendo todas en memoria se puede avisar QUÉ sedes y QUÉ
-  // días tienen disponibilidad en lugar de mostrar una grilla vacía.
   const [courtsResult, setCourtsResult] = useState({ key: null, data: [], error: false })
-
-  const [status, setStatus] = useState(null) // { type: 'error' | 'success', message }
+  const [status, setStatus] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
   const day = useMemo(() => dayOfWeek(date), [date])
@@ -89,8 +71,6 @@ export default function BookingForm() {
   const courtsLoading = courtsResult.key !== sport
   const courtsError = courtsResult.key === sport && courtsResult.error
 
-  // Memoizado para no devolver un `[]` nuevo en cada render: de él cuelgan
-  // todos los valores derivados de abajo.
   const courts = useMemo(
     () => (courtsResult.key === sport ? courtsResult.data : []),
     [courtsResult, sport]
@@ -98,7 +78,6 @@ export default function BookingForm() {
 
   const sportLabel = SPORTS.find((s) => s.value === sport)?.label.toLowerCase() ?? sport
 
-  /** ¿Esa sede tiene canchas del deporte elegido? */
   const locationHasSport = useCallback(
     (idLocation) => courts.some((c) => String(c.idLocateCourt) === String(idLocation)),
     [courts]
@@ -114,37 +93,22 @@ export default function BookingForm() {
     [courtsInLocation, day]
   )
 
-  // Días de la semana con al menos un horario en esa sede. Sin esto, caer en un
-  // día sin cobertura es un callejón sin salida: la grilla queda vacía y no hay
-  // forma de saber qué otro día probar.
   const daysWithSlots = useMemo(
     () => DAYS.filter((d) => courtsInLocation.some((c) => c.horariesForDay(d).length > 0)),
     [courtsInLocation]
   )
 
-  // Sedes que sí tienen canchas de este deporte, para sugerirlas cuando la
-  // elegida no tiene ninguna.
   const locationsWithSport = useMemo(
     () => locations.filter((loc) => locationHasSport(loc.idLocation)),
     [locations, locationHasSport]
   )
 
-  // Hay una respuesta cargada y una selección completa: recién ahí tiene sentido
-  // explicar por qué la grilla está vacía.
   const ready = Boolean(idLocateCourt) && Boolean(day) && !courtsLoading && !courtsError
 
   const visibleHorarios = horarios.filter((h) => h.matchesShift(shift))
 
-  // Se declara acá, junto al resto de los valores derivados y ANTES de las
-  // funciones que la usan (toggleShift y handleSubmit). Estando declarada
-  // después, cualquier llamada durante el render rompía con
-  // "Cannot access 'selectedHorario' before initialization".
   const selectedHorario = horarios.find((h) => h.idHorary === idHorary)
 
-  // Detalle de precios. Replica el cálculo del backend (reserveController:
-  // `totalAmount = hourlyPrice + Σ priceService`) para poder mostrar el importe
-  // final ANTES de crear la reserva: hasta ahora el usuario recién lo veía en
-  // Mercado Pago, con la reserva ya generada.
   const chosenServices = useMemo(
     () => services.filter((s) => selectedServices.includes(s.idService)),
     [services, selectedServices]
@@ -158,13 +122,10 @@ export default function BookingForm() {
     )
   }, [selectedHorario, chosenServices])
 
-  /** Alterna la franja. Volver a tocar la franja activa vuelve a "todas". */
   function toggleShift(value) {
     const next = shift === value ? '' : value
     setShift(next)
 
-    // Si el horario elegido queda fuera del filtro, se deselecciona: no puede
-    // quedar seleccionado algo que el usuario ya no ve en pantalla.
     if (selectedHorario && !selectedHorario.matchesShift(next)) {
       setIdHorary(null)
     }
@@ -202,18 +163,14 @@ export default function BookingForm() {
       const { init_point, autoReturn } = await createPaymentPreference(reserve.idReserve)
 
       if (autoReturn) {
-        // MercadoPago devuelve al usuario solo a /pago/exito|error|pendiente.
         window.location.assign(init_point)
         return
       }
 
-      // Sin back_urls (pasa siempre que el front no esté publicado por https)
-      // MercadoPago deja al usuario en su pantalla final, sin forma de volver.
-      // Se abre el checkout en otra pestaña y esta queda esperando el resultado,
-      // así el usuario termina de vuelta en CanchaYa igual.
+      // Sin back_urls MercadoPago no puede devolver al usuario: se abre el
+      // checkout en otra pestaña y esta queda esperando el resultado
       const checkout = window.open(init_point, '_blank')
       if (!checkout) {
-        // Pestaña bloqueada por el navegador: mejor ir al checkout que quedarse.
         window.location.assign(init_point)
         return
       }
@@ -222,9 +179,6 @@ export default function BookingForm() {
     } catch (err) {
       setStatus({
         type: 'error',
-        // El backend manda unos errores bajo `error` (reserva) y otros bajo
-        // `message` (pago), así que se contemplan los dos: leyendo solo
-        // `message` los motivos reales de rechazo quedaban invisibles.
         message:
           err.response?.data?.error ||
           err.response?.data?.message ||
@@ -233,7 +187,6 @@ export default function BookingForm() {
       setSubmitting(false)
     }
   }
-
 
   return (
     <form className="booking" onSubmit={handleSubmit} noValidate>
@@ -266,9 +219,6 @@ export default function BookingForm() {
           >
             <option value="">Elegí una sede</option>
             {locations.map((loc) => {
-              // No se deshabilitan: si la sede no tiene el deporte hay que poder
-              // elegirla igual para leer el motivo, en vez de que la opción
-              // desaparezca sin explicación.
               const hasSport = courtsLoading || locationHasSport(loc.idLocation)
               return (
                 <option key={loc.idLocation} value={loc.idLocation}>
@@ -338,8 +288,6 @@ export default function BookingForm() {
           <p className="hint">Los horarios todavía no están disponibles.</p>
         )}
 
-        {/* Los tres casos vacíos se explican por separado: "no hay nada" a secas
-            deja al usuario probando combinaciones a ciegas. */}
         {ready && courtsInLocation.length === 0 && (
           <p className="hint">
             {`Esta sede no tiene canchas de ${sportLabel}.`}

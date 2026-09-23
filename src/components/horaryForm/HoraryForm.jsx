@@ -13,25 +13,11 @@ function toFormState(horary) {
   return {
     idCourt: String(horary.idCourt),
     day: horary.day,
-    startTime: horary.start, // "18:00:00" -> "18:00"
+    startTime: horary.start,  // "18:00:00" -> "18:00"
     endTime: horary.end
   }
 }
 
-/**
- * Formulario de alta y edición de horarios.
- *
- * Igual que CourtForm, es un componente controlado desde afuera: recibe todo
- * por props (input properties) y avisa por callbacks (output properties). No
- * conoce la API.
- *
- * @param {Horary|null} horary     horario a editar; null para crear uno nuevo
- * @param {Array}       courts     canchas disponibles para el select
- * @param {boolean}     submitting deshabilita el formulario mientras guarda
- * @param {string|null} error      mensaje de error a mostrar
- * @param {Function}    onSubmit   (payload) => void  ← output property
- * @param {Function}    onCancel   () => void         ← output property
- */
 export default function HoraryForm({
   horary = null,
   courts = [],
@@ -43,7 +29,6 @@ export default function HoraryForm({
   const [form, setForm] = useState(() => toFormState(horary))
   const isEditing = Boolean(horary)
 
-  // El backend rechaza inicio >= fin; se avisa antes de mandar el pedido.
   const rangoInvalido = Boolean(form.startTime && form.endTime && form.startTime >= form.endTime)
 
   function handleChange(e) {

@@ -1,12 +1,5 @@
 import { fromBackendDate, toBackendDate } from '../utils/birthDate'
 
-/**
- * Usuario logueado.
- *
- * El backend guarda la fecha de nacimiento como "dd/mm/aaaa"; esta clase la
- * expone también en el formato del `<input type="date">` para que la pantalla
- * de perfil no tenga que dar vuelta strings a mano.
- */
 export class User {
   constructor({ idUser, nameUser, surnameUser, aliasUser, emailUser, dateUser, typeUser, stateUser }) {
     this.idUser = idUser
@@ -19,7 +12,6 @@ export class User {
     this.stateUser = stateUser
   }
 
-  /** Factory Method: construye una instancia desde la respuesta cruda del backend. */
   static fromDTO(dto) {
     return new User(dto)
   }
@@ -32,12 +24,10 @@ export class User {
     return this.typeUser === 'ADMIN'
   }
 
-  /** "24/07/2004" → "2004-07-24", que es lo que espera el input de fecha. */
   get birthDateIso() {
     return fromBackendDate(this.dateUser)
   }
 
-  /** Los campos que acepta `PUT /usuarios/me`, con la fecha ya convertida. */
   static toPayload({ nameUser, surnameUser, aliasUser, birthDateIso }) {
     return {
       nameUser: nameUser.trim(),

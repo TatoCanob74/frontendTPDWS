@@ -1,6 +1,4 @@
-// =========================================================
-//  BOTONES
-// =========================================================
+// Botones
 .btn {
   display: inline-flex;
   align-items: center;
@@ -73,7 +71,6 @@
     font-size: 14px;
   }
 
-  // Acción destructiva discreta: eliminar dentro de una tabla.
   &--danger {
     background: #fdecea;
     color: #9a3324;
@@ -85,7 +82,6 @@
     }
   }
 
-  // Acción destructiva ya confirmada: el botón final del diálogo.
   &--danger-solid {
     background: #9a3324;
     color: #fff;

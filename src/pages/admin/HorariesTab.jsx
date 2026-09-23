@@ -5,38 +5,20 @@ import { DAYS, SHIFTS, findShift } from '../../models/Horary'
 import HoraryForm from '../../components/horaryForm/HoraryForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
-/**
- * ABM de horarios: las franjas en las que cada cancha se puede reservar.
- *
- * Sin esta pantalla, una cancha con horarios cargados no se puede eliminar
- * nunca desde la aplicación, porque el backend bloquea el borrado mientras
- * queden franjas asociadas.
- */
 export default function HorariesTab() {
   const [courts, setCourts] = useState([])
-
-  // Filtros del listado
   const [filterCourt, setFilterCourt] = useState('')
   const [filterDay, setFilterDay] = useState('')
   const [filterShift, setFilterShift] = useState('')
-
-  // Se incrementa después de cada alta/edición/baja para forzar la recarga.
   const [reloadToken, setReloadToken] = useState(0)
   const filterKey = `${filterCourt}|${filterDay}|${filterShift}|${reloadToken}`
 
-  // El resultado se guarda junto con la "clave" del pedido que lo originó, para
-  // derivar loading y error comparando esa clave contra los filtros actuales.
   const [result, setResult] = useState({ key: null, horaries: [], error: null })
-
-  // null = no se edita nada; un Horary = edición; 'new' = alta
   const [editing, setEditing] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState(null)
-
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
-
-  // Errores de una acción (por ej. el 409 al eliminar), distintos de los de carga.
   const [actionError, setActionError] = useState(null)
   const [notice, setNotice] = useState(null)
 
@@ -48,8 +30,6 @@ export default function HorariesTab() {
 
   useEffect(() => {
     let ignore = false
-    // La franja se traduce a from/to y la resuelve el backend, para no traer
-    // todos los horarios de la cancha y descartarlos acá.
     const shift = findShift(filterShift)
 
     getHoraries({
@@ -83,7 +63,6 @@ export default function HorariesTab() {
     setReloadToken((t) => t + 1)
   }
 
-  /** "2" -> "Futbol 5 - Cancha A". Si la cancha ya no está, muestra el id. */
   function courtName(idCourt) {
     const court = courts.find((c) => String(c.idCourt) === String(idCourt))
     return court ? court.nameCourt : `Cancha #${idCourt}`
@@ -103,7 +82,6 @@ export default function HorariesTab() {
       setEditing(null)
       reload()
     } catch (err) {
-      // 409 si se superpone con otro, o si ya tiene reservas asociadas
       setFormError(messageFrom(err, 'No pudimos guardar el horario.'))
     } finally {
       setSubmitting(false)
@@ -120,7 +98,6 @@ export default function HorariesTab() {
       setNotice('Horario eliminado correctamente.')
       reload()
     } catch (err) {
-      // El backend responde 409 si el horario tiene reservas
       setActionError(messageFrom(err, 'No pudimos eliminar el horario.'))
     } finally {
       setDeleting(false)

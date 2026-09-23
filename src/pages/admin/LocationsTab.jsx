@@ -8,19 +8,14 @@ import {
 import LocationForm from '../../components/locationForm/LocationForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
-/** ABM de localidades: listar, crear, editar y eliminar. */
 export default function LocationsTab() {
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
-
-  // null = no se está editando nada; una Location = edición; 'new' = alta
   const [editing, setEditing] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState(null)
-
-  // Localidad pendiente de confirmación de borrado (null = diálogo cerrado)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -61,7 +56,6 @@ export default function LocationsTab() {
     }
   }
 
-  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Eliminar". */
   async function handleDeleteConfirmed() {
     if (!confirmingDelete) return
 
@@ -72,7 +66,6 @@ export default function LocationsTab() {
       setNotice('Localidad eliminada correctamente.')
       await loadLocations()
     } catch (err) {
-      // El backend responde 409 si la localidad tiene canchas asociadas
       setError(messageFrom(err, 'No pudimos eliminar la localidad.'))
     } finally {
       setDeleting(false)

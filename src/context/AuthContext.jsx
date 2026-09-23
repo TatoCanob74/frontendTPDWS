@@ -15,13 +15,10 @@ function decodePayload(token) {
 function decodeUser(token) {
   const payload = decodePayload(token)
   if (!payload) return null
-  // El token trae `exp` en segundos: si ya venció, lo tratamos como si no
-  // hubiera sesión (si no, el Navbar seguía mostrando "Admin" con un token viejo).
   if (payload.exp && Date.now() >= payload.exp * 1000) return null
   return { idUser: payload.idUser, emailUser: payload.emailUser, typeUser: payload.typeUser }
 }
 
-// Devuelve el token guardado solo si sigue siendo válido; si venció, lo borra.
 function getValidToken() {
   const token = getToken()
   if (token && !decodeUser(token)) {

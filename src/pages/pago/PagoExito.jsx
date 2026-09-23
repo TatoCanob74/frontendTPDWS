@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { usePaymentReturn } from '../../hooks/usePaymentReturn'
 import ReserveDetail from '../../components/reserveDetail/ReserveDetail'
 
-// Cuánto se espera antes de llevar al usuario a "Mis reservas". Lo justo para
-// que llegue a leer el detalle de la reserva sin quedarse en una pantalla muerta.
 const REDIRECT_DELAY_MS = 8000
 
 export default function PagoExito() {
@@ -13,8 +11,6 @@ export default function PagoExito() {
 
   const confirmed = reserve?.stateReserva === 'confirmada'
 
-  // Antes había que apretar el botón sí o sí: si el usuario no lo veía, se
-  // quedaba en la pantalla de pago sin saber si la reserva había quedado hecha.
   useEffect(() => {
     if (loading) return
 

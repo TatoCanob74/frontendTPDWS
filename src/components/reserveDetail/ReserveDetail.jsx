@@ -1,10 +1,3 @@
-/**
- * Detalle de una reserva ya pagada: qué se reservó y cuánto se pagó.
- *
- * Lo usan las pantallas de retorno del checkout. Cada fila se omite si el
- * endpoint no incluyó ese dato, así el componente sirve igual con una reserva
- * "pelada" (sin cancha ni horario anidados).
- */
 export default function ReserveDetail({ reserve }) {
   if (!reserve) return null
 

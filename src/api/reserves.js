@@ -1,15 +1,6 @@
 import { client, emptyOn404 } from './client'
 import { Reserve } from '../models/Reserve'
 
-// Rutas reales del backend (rama de Francisco):
-//   POST  /usuarios/createReserve       crear reserva
-//   GET   /reservas/mis-reservas        reservas del usuario logueado
-//   PATCH /reservas/:id/cancelar        cancelar una reserva propia
-//   POST  /reserves/:id/pago            preferencia de MercadoPago
-//   POST  /reserves/:id/pago/confirmar  confirmar el pago al volver del checkout
-//   GET   /reserves/:id/pago            estado del pago
-//   POST  /reservas/sincronizar-pagos   pone al día las reservas pendientes
-
 export function createReserve({ typeCourt, idLocateCourt, dateReserve, day, idHorary, services }) {
   return client
     .post('/usuarios/createReserve', {
@@ -29,11 +20,6 @@ export function getMyReserves({ stateReserva } = {}) {
   ).then(Reserve.fromList)
 }
 
-/**
- * Cancela una reserva propia.
- * El backend solo permite cancelar reservas pendientes y con al menos
- * 6 horas de anticipación; si no, responde 400 con el motivo.
- */
 export function cancelReserve(idReserve) {
   return client.patch(`/reservas/${idReserve}/cancelar`).then((r) => r.data)
 }
@@ -46,23 +32,10 @@ export function confirmPayment(idReserve, paymentId) {
   return client.post(`/reserves/${idReserve}/pago/confirmar`, { payment_id: paymentId }).then((r) => r.data)
 }
 
-/**
- * Estado del pago + la reserva completa (cancha, horario y servicios), que es
- * lo que necesitan las pantallas de retorno para mostrar el detalle sin tener
- * que volver a pedir la reserva por separado.
- */
 export function getPaymentStatus(idReserve) {
   return client.get(`/reserves/${idReserve}/pago`).then((r) => Reserve.fromDTO(r.data))
 }
 
-/**
- * Vuelve a consultar en MercadoPago las reservas pendientes del usuario.
- *
- * Sirve para el caso en que el pago se aprobó pero la reserva quedó en
- * "pendiente": pasa cuando el usuario cierra la pestaña antes de volver del
- * checkout, o cuando el backend corre en localhost y MercadoPago no puede
- * llamar al webhook.
- */
 export function syncPayments() {
   return client.post('/reservas/sincronizar-pagos').then((r) => r.data)
 }

@@ -1,8 +1,6 @@
+// Listados de reservas y tablas del admin
 @use 'mixins' as *;
 
-// =========================================================
-//  TARJETAS DE RESERVA / TABLAS (Mis reservas, Admin)
-// =========================================================
 .reserve-list {
   display: flex;
   flex-direction: column;
@@ -47,8 +45,6 @@
   }
 }
 
-// La tabla no se reflowea en mobile: scrollea horizontalmente dentro de su
-// contenedor, para que el resto de la página nunca scrollee de costado.
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -83,8 +79,6 @@ table.data-table {
   display: flex;
   gap: 10px;
   margin-bottom: 24px;
-  // Con 6 pestañas la fila mide ~700px y se salía de pantalla en mobile.
-  // Se permite que bajen de línea y, si aún no entran, que scrolleen.
   flex-wrap: wrap;
   max-width: 100%;
 
@@ -107,13 +101,11 @@ table.data-table {
   }
 }
 
-// ---- ABM: barra de acciones y botones dentro de la tabla ----
 .admin-actions {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
 
-  // A todo el ancho en mobile; del tamaño de su contenido cuando hay lugar.
   .btn {
     width: 100%;
 

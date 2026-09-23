@@ -22,11 +22,7 @@ function UsersTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
-
-  // idUser cuyo toggle de estado está en curso (null = ninguno)
   const [togglingId, setTogglingId] = useState(null)
-
-  // Usuario pendiente de confirmación de borrado (null = diálogo cerrado)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -57,7 +53,6 @@ function UsersTab() {
     }
   }
 
-  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Eliminar". */
   async function handleDeleteConfirmed() {
     if (!confirmingDelete) return
 
@@ -68,7 +63,6 @@ function UsersTab() {
       setNotice('Usuario eliminado correctamente.')
       await loadUsers()
     } catch (err) {
-      // El backend responde 409 si el usuario tiene reservas asociadas
       setError(messageFrom(err, 'No pudimos eliminar el usuario.'))
     } finally {
       setDeleting(false)
@@ -160,15 +154,9 @@ function ReservesTab() {
   const [dateReserve, setDateReserve] = useState('')
   const filterKey = `${stateReserva}|${dateReserve}`
 
-  // Se guarda junto con la "clave" de filtros que la originó, para derivar
-  // loading/error comparando esa clave contra los filtros actuales.
   const [result, setResult] = useState({ key: null, reserves: [], error: null })
   const [notice, setNotice] = useState(null)
-
-  // idReserve cuyo cambio de estado está en curso (null = ninguno)
   const [updatingId, setUpdatingId] = useState(null)
-
-  // Reserva pendiente de confirmación de borrado (null = diálogo cerrado)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -222,7 +210,6 @@ function ReservesTab() {
     }
   }
 
-  /** Se ejecuta cuando el admin confirma en el diálogo, no al apretar "Eliminar". */
   async function handleDeleteConfirmed() {
     if (!confirmingDelete) return
 

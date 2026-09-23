@@ -1,8 +1,6 @@
+// Formularios y grilla de horarios
 @use 'mixins' as *;
 
-// =========================================================
-//  RESERVA (formulario) Y FORMULARIOS EN GENERAL
-// =========================================================
 .booking {
   max-width: 720px;
   margin-inline: auto;
@@ -13,8 +11,6 @@
   flex-direction: column;
   gap: 26px;
 
-  // En mobile la tarjeta ocupa casi todo el ancho: un padding de 36px se come
-  // el espacio útil de los campos.
   padding: 24px 20px;
   border-radius: var(--radius-lg);
 
@@ -29,8 +25,6 @@
     border-top: 1px solid #edf2ee;
     padding-top: 22px;
 
-    // Apilado y a todo el ancho en mobile: el botón principal tiene que ser
-    // fácil de tocar con el pulgar.
     flex-direction: column;
     align-items: stretch;
 
@@ -64,7 +58,6 @@
     color: var(--ink-soft);
   }
 
-  // Dos campos por fila solo cuando hay ancho; si no, uno debajo del otro.
   &__row {
     display: grid;
     gap: 18px;
@@ -76,7 +69,6 @@
   }
 }
 
-// Fila de filtros de un listado: se adapta a 2, 3 o 4 campos sin romperse.
 .filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -110,8 +102,6 @@
   display: grid;
   gap: 10px;
 
-  // En pantallas muy angostas los tres deportes en fila quedan ilegibles:
-  // se apilan y el ícono pasa al costado del texto.
   grid-template-columns: 1fr;
 
   .chip {
@@ -159,8 +149,6 @@
   }
 }
 
-// Grilla de horarios. Las celdas son más angostas en mobile para que entren
-// al menos tres por fila.
 .slots {
   display: grid;
   gap: 8px;
@@ -175,14 +163,12 @@
   padding: 11px 6px;
   border-radius: var(--radius-sm);
   font-size: 13.5px;
-  // El slot puede mostrar la hora y, debajo, el nombre de la cancha.
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   line-height: 1.25;
 
-  // Nombre de la cancha dentro del slot: dos canchas pueden tener la misma hora.
   &__court {
     font-size: 10.5px;
     font-weight: 600;
@@ -193,8 +179,6 @@
     white-space: nowrap;
   }
 
-  // Precio del slot (o del servicio): el usuario tiene que poder comparar
-  // opciones sin entrar al checkout.
   &__price {
     font-size: 11px;
     font-weight: 700;
@@ -235,8 +219,6 @@
   }
 }
 
-// Lista de pares etiqueta/valor: el desglose del precio antes de pagar y el
-// detalle de la reserva en las pantallas de retorno del pago.
 .detail-list {
   display: flex;
   flex-direction: column;
@@ -261,7 +243,6 @@
     white-space: nowrap;
   }
 
-  // Fila de cierre (el total): se separa con una línea y pesa más.
   &__row--total {
     border-top: 1px solid var(--line);
     padding-top: 8px;
@@ -286,8 +267,6 @@
     font-weight: 600;
     font-size: 16px;
 
-    // El total es el dato que más se busca en esta pantalla: va más grande y
-    // en el verde de marca para destacarlo junto al botón de pago.
     &--total {
       font-size: 22px;
       font-weight: 700;

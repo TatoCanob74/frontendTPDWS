@@ -8,19 +8,14 @@ import {
 import ServiceForm from '../../components/serviceForm/ServiceForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
-/** ABM de servicios adicionales: listar, crear, editar y eliminar. */
 export default function ServicesTab() {
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
-
-  // null = no se está editando nada; un Service = edición; 'new' = alta
   const [editing, setEditing] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState(null)
-
-  // Servicio pendiente de confirmación de borrado (null = diálogo cerrado)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -61,7 +56,6 @@ export default function ServicesTab() {
     }
   }
 
-  /** Se ejecuta cuando el usuario confirma en el diálogo, no al apretar "Eliminar". */
   async function handleDeleteConfirmed() {
     if (!confirmingDelete) return
 
@@ -72,7 +66,6 @@ export default function ServicesTab() {
       setNotice('Servicio eliminado correctamente.')
       await loadServices()
     } catch (err) {
-      // El backend responde 409 si el servicio está asociado a reservas existentes
       setError(messageFrom(err, 'No pudimos eliminar el servicio.'))
     } finally {
       setDeleting(false)

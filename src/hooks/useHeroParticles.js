@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 
-// Port de initParticles() del mockup: puntos flotando + líneas entre los que están cerca.
 export function useHeroParticles(canvasRef) {
   useEffect(() => {
     const canvas = canvasRef.current

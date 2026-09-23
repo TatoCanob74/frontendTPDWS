@@ -1,8 +1,6 @@
+// Barra de navegación
 @use 'mixins' as *;
 
-// =========================================================
-//  NAV
-// =========================================================
 .nav {
   position: fixed;
   inset: 0 0 auto 0;
@@ -16,7 +14,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    // min-width: 0 deja que los hijos se encojan en vez de desbordar la barra.
     min-width: 0;
     gap: 10px;
     padding-block: 14px;
@@ -37,8 +34,6 @@
     }
   }
 
-  // En mobile la barra solo muestra la marca y el botón de acción: los enlaces
-  // de sección no entran sin empujar el CTA fuera de la pantalla.
   &__link {
     display: none;
     color: rgba(255, 255, 255, 0.75);
@@ -55,8 +50,6 @@
     }
   }
 
-  // El email del usuario es largo y desplazaba "Cerrar sesión". Se oculta en
-  // mobile; el perfil sigue siendo accesible desde el menú.
   &__user {
     display: none;
     color: rgba(255, 255, 255, 0.85);

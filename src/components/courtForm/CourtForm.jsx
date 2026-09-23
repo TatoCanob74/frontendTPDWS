@@ -20,24 +20,6 @@ function toFormState(court) {
   }
 }
 
-/**
- * Formulario de alta y edición de canchas.
- *
- * Es un componente controlado desde afuera: no sabe nada de la API ni de cómo
- * se guarda. Recibe los datos por props (input properties) y avisa lo que pasa
- * por callbacks (output properties).
- *
- * El estado inicial se calcula una sola vez. Para cargar otra cancha, el padre
- * debe pasarle una `key` distinta y React remonta el componente: es el patrón
- * recomendado en vez de sincronizar el estado con un useEffect.
- *
- * @param {Court|null} court      cancha a editar; null para crear una nueva
- * @param {Array}      locations  sedes disponibles para el select
- * @param {boolean}    submitting deshabilita el formulario mientras se guarda
- * @param {string|null} error     mensaje de error a mostrar
- * @param {Function}   onSubmit   (payload) => void  ← output property
- * @param {Function}   onCancel   () => void         ← output property
- */
 export default function CourtForm({
   court = null,
   locations = [],

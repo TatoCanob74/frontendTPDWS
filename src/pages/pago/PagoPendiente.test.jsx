@@ -16,7 +16,6 @@ const PENDIENTE = Reserve.fromDTO({
   idReserve: 12, stateReserva: 'pendiente', paymentStatus: null, paymentId: null, totalAmount: '6500.00'
 })
 
-// Forma real de GET /reserves/:id/pago: la reserva con cancha, horario y servicios.
 const CONFIRMADA = Reserve.fromDTO({
   idReserve: 12,
   stateReserva: 'confirmada',
@@ -45,7 +44,6 @@ afterEach(() => vi.useRealTimers())
 
 describe('PagoPendiente esperando en otra pestaña', () => {
   it('al volver el foco reconsulta y muestra el pago confirmado', async () => {
-    // Primera consulta: todavía pendiente. Segunda (al volver el foco): aprobada.
     getPaymentStatus.mockResolvedValueOnce(PENDIENTE).mockResolvedValue(CONFIRMADA)
 
     renderPage('?reserva=12&esperando=1')
@@ -54,7 +52,6 @@ describe('PagoPendiente esperando en otra pestaña', () => {
     expect(screen.getByRole('heading', { name: 'Esperando tu pago' })).toBeInTheDocument()
     expect(getPaymentStatus).toHaveBeenCalledTimes(1)
 
-    // El usuario vuelve de la pestaña de MercadoPago.
     await act(async () => { window.dispatchEvent(new Event('focus')) })
 
     await waitFor(() => expect(screen.getByText('Pago aprobado · Reserva confirmada')).toBeInTheDocument())
@@ -68,14 +65,12 @@ describe('PagoPendiente esperando en otra pestaña', () => {
     await screen.findByRole('heading', { name: '¡Reserva confirmada!' })
     expect(screen.getByText('Pago aprobado · Reserva confirmada')).toBeInTheDocument()
 
-    // Los datos de la reserva, que antes no se mostraban en ningún lado.
     for (const dato of ['Pádel', 'Punto Cordobes', 'Cordoba', '2026-09-11', '20:00 - 21:00', 'Parrilla']) {
       expect(screen.getByText(dato)).toBeInTheDocument()
     }
     expect(screen.getByText('Total pagado')).toBeInTheDocument()
     expect(screen.getByText(/6\.500/)).toBeInTheDocument()
 
-    // Y sigue estando el camino a la pantalla que ya existía.
     expect(screen.getByRole('link', { name: 'Ver mis reservas' })).toBeInTheDocument()
   })
 

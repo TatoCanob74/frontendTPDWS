@@ -10,15 +10,11 @@ const emptyForm = {
   birthDateIso: ''
 }
 
-/** Perfil del usuario logueado: ver los datos de la cuenta y editarlos. */
 export default function Perfil() {
   const [user, setUser] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
-
-  // Se pasa a true recién cuando el usuario toca "Editar", así la pantalla
-  // arranca mostrando los datos y no un formulario abierto.
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
@@ -49,7 +45,6 @@ export default function Perfil() {
     setEditing(true)
   }
 
-  /** Descarta los cambios y vuelve a mostrar lo que está guardado. */
   function cancelEditing() {
     setForm({
       nameUser: user.nameUser ?? '',

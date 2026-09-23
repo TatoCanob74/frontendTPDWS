@@ -1,10 +1,6 @@
+// Diálogo de confirmación
 @use 'mixins' as *;
 
-// =========================================================
-//  DIÁLOGO DE CONFIRMACIÓN (reemplaza a window.confirm)
-// =========================================================
-// En mobile es una hoja pegada al borde inferior, cerca del pulgar, con los
-// botones apilados. A partir de MD se convierte en un diálogo centrado.
 .modal {
   position: fixed;
   inset: 0;
