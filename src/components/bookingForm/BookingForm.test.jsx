@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 
-import { Court } from '../../models/Court'
-import { Service } from '../../models/Service'
+import { Court } from '../../models/court'
+import { Service } from '../../models/service'
 
 vi.mock('../../api/courts', () => ({
   getLocations: vi.fn(),
@@ -29,11 +29,11 @@ const CAMPUS_ROSARIO = {
   stateCourt: 'DISPONIBLE',
   capacityPlayers: 10,
   idLocateCourt: 1,
-  Horarios: [
+  horaries: [
     { idHorary: 1, startTime: '10:00:00', endTime: '11:00:00', day: 'Martes' },
     { idHorary: 39, startTime: '19:00:00', endTime: '20:00:00', day: 'Jueves' }
   ],
-  Localidad: { idLocation: 1, nomLocation: 'Rosario' }
+  location: { idLocation: 1, nomLocation: 'Rosario' }
 }
 
 const LOCATIONS = [

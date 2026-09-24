@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { COURT_TYPES } from '../../models/Court'
+import { COURT_TYPES } from '../../models/court'
 
 const emptyForm = {
   typeCourt: 'FUTBOL',

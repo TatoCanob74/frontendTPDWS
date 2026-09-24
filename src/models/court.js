@@ -1,4 +1,4 @@
-import { Horary } from './Horary.js'
+import { Horary } from './horary.js'
 import { formatCurrency } from '../utils/currency.js'
 
 export const COURT_TYPES = [
@@ -16,8 +16,8 @@ export class Court {
     stateCourt,
     capacityPlayers,
     idLocateCourt,
-    Horarios = [],
-    Localidad = null
+    horaries = [],
+    location = null
   }) {
     this.idCourt = idCourt
     this.typeCourt = typeCourt
@@ -26,8 +26,8 @@ export class Court {
     this.stateCourt = stateCourt
     this.capacityPlayers = capacityPlayers
     this.idLocateCourt = idLocateCourt
-    this.horaries = Horary.fromList(Horarios)
-    this.location = Localidad
+    this.horaries = Horary.fromList(horaries)
+    this.location = location
   }
 
   static fromDTO(dto) {

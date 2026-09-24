@@ -1,5 +1,5 @@
 import { client, emptyOn404 } from './client'
-import { Reserve } from '../models/Reserve'
+import { Reserve } from '../models/reserve'
 
 export function createReserve({ typeCourt, idLocateCourt, dateReserve, day, idHorary, services }) {
   return client

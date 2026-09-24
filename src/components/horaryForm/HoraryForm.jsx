@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DAYS } from '../../models/Horary'
+import { DAYS } from '../../models/horary'
 
 const emptyForm = {
   idCourt: '',

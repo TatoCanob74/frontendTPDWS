@@ -1,5 +1,5 @@
 import { client, emptyOn404 } from './client'
-import { Location } from '../models/Location'
+import { Location } from '../models/location'
 
 export function getLocations() {
   return emptyOn404(client.get('/localidades').then((r) => r.data)).then(Location.fromList)

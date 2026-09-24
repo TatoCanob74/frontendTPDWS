@@ -1,5 +1,5 @@
 import { client } from './client'
-import { User } from '../models/User'
+import { User } from '../models/user'
 
 export function getMyProfile() {
   return client.get('/usuarios/me').then((r) => User.fromDTO(r.data))

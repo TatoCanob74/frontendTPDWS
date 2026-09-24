@@ -1,5 +1,5 @@
 import { client, emptyOn404 } from './client'
-import { Horary } from '../models/Horary'
+import { Horary } from '../models/horary'
 
 export function getHoraries({ idCourt, day, from, to } = {}) {
   return emptyOn404(

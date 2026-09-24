@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { getCourts, getLocations } from '../../api/courts'
 import { getServices } from '../../api/services'
 import { createReserve, createPaymentPreference } from '../../api/reserves'
-import { DAYS, SHIFTS } from '../../models/Horary'
+import { DAYS, SHIFTS } from '../../models/horary'
 import { formatCurrency } from '../../utils/currency'
 
 const SPORTS = [

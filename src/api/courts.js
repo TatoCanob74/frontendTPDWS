@@ -1,5 +1,5 @@
 import { client, emptyOn404 } from './client'
-import { Court } from '../models/Court'
+import { Court } from '../models/court'
 import { getLocations } from './locations'
 
 export { getLocations }

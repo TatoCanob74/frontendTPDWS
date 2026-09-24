@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getMyProfile, updateMyProfile } from '../../api/users'
-import { User } from '../../models/User'
+import { User } from '../../models/user'
 import { maxBirthDateIso, minBirthDateIso, validateBirthDate } from '../../utils/birthDate'
 
 const emptyForm = {

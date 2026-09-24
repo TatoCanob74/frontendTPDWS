@@ -10,7 +10,7 @@ vi.mock('../../api/reserves', () => ({
 import PagoPendiente from './PagoPendiente'
 import { getPaymentStatus } from '../../api/reserves'
 
-import { Reserve } from '../../models/Reserve'
+import { Reserve } from '../../models/reserve'
 
 const PENDIENTE = Reserve.fromDTO({
   idReserve: 12, stateReserva: 'pendiente', paymentStatus: null, paymentId: null, totalAmount: '6500.00'
@@ -23,12 +23,12 @@ const CONFIRMADA = Reserve.fromDTO({
   paymentId: '177183867195',
   dateReserve: '2026-09-11',
   totalAmount: '6500.00',
-  Cancha: {
+  court: {
     idCourt: 6, typeCourt: 'PADEL', nameCourt: 'Punto Cordobes', hourlyPrice: '6500.00',
-    Localidad: { idLocation: 3, nomLocation: 'Cordoba' }
+    location: { idLocation: 3, nomLocation: 'Cordoba' }
   },
-  Horario: { idHorary: 13, startTime: '20:00:00', endTime: '21:00:00', day: 'Viernes' },
-  Servicios: [{ idService: 1, nameService: 'Parrilla', priceService: '100.00' }]
+  horary: { idHorary: 13, startTime: '20:00:00', endTime: '21:00:00', day: 'Viernes' },
+  services: [{ idService: 1, nameService: 'Parrilla', priceService: '100.00' }]
 })
 
 function renderPage(search) {

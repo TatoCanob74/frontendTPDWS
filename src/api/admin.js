@@ -1,5 +1,5 @@
 import { client } from './client'
-import { Reserve } from '../models/Reserve'
+import { Reserve } from '../models/reserve'
 
 export function getUsers() {
   return client.get('/seeUsers').then((r) => r.data)

@@ -1,5 +1,5 @@
-import { Court } from './Court.js'
-import { Horary } from './Horary.js'
+import { Court } from './court.js'
+import { Horary } from './horary.js'
 import { formatCurrency } from '../utils/currency.js'
 
 const PAYMENT_LABELS = {
@@ -25,9 +25,9 @@ export class Reserve {
     idUser,
     idCourt,
     idHorary,
-    Cancha = null,
-    Horario = null,
-    Servicios = []
+    court = null,
+    horary = null,
+    services = []
   }) {
     this.idReserve = idReserve
     this.dateReserve = dateReserve
@@ -38,9 +38,9 @@ export class Reserve {
     this.idUser = idUser
     this.idCourt = idCourt
     this.idHorary = idHorary
-    this.court = Cancha ? Court.fromDTO(Cancha) : null
-    this.horary = Horario ? Horary.fromDTO(Horario) : null
-    this.services = Servicios
+    this.court = court ? Court.fromDTO(court) : null
+    this.horary = horary ? Horary.fromDTO(horary) : null
+    this.services = services
   }
 
   static fromDTO(dto) {

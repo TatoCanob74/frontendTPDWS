@@ -1,5 +1,5 @@
 import { client, emptyOn404 } from './client'
-import { Service } from '../models/Service'
+import { Service } from '../models/service'
 
 export function getServices() {
   return emptyOn404(client.get('/servicios').then((r) => r.data)).then(Service.fromList)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getHoraries, createHorary, updateHorary, deleteHorary } from '../../api/horaries'
 import { getCourtsForAdmin } from '../../api/courts'
-import { DAYS, SHIFTS, findShift } from '../../models/Horary'
+import { DAYS, SHIFTS, findShift } from '../../models/horary'
 import HoraryForm from '../../components/horaryForm/HoraryForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
