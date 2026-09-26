@@ -273,7 +273,7 @@ export default function BookingForm() {
               className="chip slot"
               aria-pressed={idHorary === h.idHorary}
               aria-label={[h.start, h.courtName, h.formattedPrice].filter(Boolean).join(', ')}
-              onClick={() => setIdHorary(h.idHorary)}
+              onClick={() => setIdHorary(h.idHorary === idHorary ? null : h.idHorary)}
             >
               {h.start}
               {h.courtName && <small className="slot__court">{h.courtName}</small>}

@@ -58,7 +58,9 @@
     transition: color 0.2s ease;
 
     @include md {
-      display: inline;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
   }
 
@@ -82,7 +84,6 @@
 
 a.nav__user:hover {
   color: #fff;
-  text-decoration: underline;
 }
 
 .brand {

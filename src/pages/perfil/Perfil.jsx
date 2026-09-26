@@ -162,7 +162,6 @@ export default function Perfil() {
 
           <div className="booking__foot">
             <div className="summary">
-              <span className="summary__label">Tipo de cuenta</span>
               <span className="summary__value">{user.isAdmin ? 'Administrador' : 'Cliente'}</span>
             </div>
 

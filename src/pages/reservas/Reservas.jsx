@@ -76,7 +76,7 @@ export default function Reservas() {
 
       {!loading && !error && reserves.length === 0 && (
         <div className="alert">
-          Todavía no tenés reservas. <Link to="/canchas">Reservá tu primera cancha</Link>.
+          Todavía no tenés reservas. <Link to="/canchas">Reservá tu primera cancha</Link>
         </div>
       )}
 

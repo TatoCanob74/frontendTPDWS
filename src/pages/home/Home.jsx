@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useHeroParticles } from '../../hooks/useHeroParticles'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
 import SportCard from '../../components/sportCard/SportCard'
+import { useAuth } from '../../hooks/useAuth'
 
 const SPORTS = [
   {
@@ -38,6 +39,7 @@ export default function Home() {
   const canvasRef = useRef(null)
   useHeroParticles(canvasRef)
   useScrollReveal()
+  const {user} = useAuth()
 
   return (
     <>
@@ -60,7 +62,9 @@ export default function Home() {
             Disponibilidad en tiempo real, sin llamadas ni esperas.
           </p>
           <div className="hero__actions" data-reveal>
+            {user?.typeUser != 'ADMIN' && (
             <Link className="btn btn--light" to="/canchas">Reservar cancha</Link>
+            )}
             <a className="btn btn--ghost" href="#deportes">Ver deportes</a>
           </div>
           <div className="hero__stats" data-reveal>

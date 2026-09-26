@@ -11,8 +11,8 @@ export default function Footer() {
         </div>
         <div className="footer__col">
           <h4>Contacto</h4>
-          <span>📍 Av. del Deporte 1234, Buenos Aires</span>
-          <span>📞 +54 11 5555-0123</span>
+          <span>📍 Zeballos 1341, Rosario</span>
+          <span>📞 +54 9 341 555-0123</span>
           <span>✉️ hola@canchaya.com</span>
         </div>
         <div className="footer__col">
@@ -24,10 +24,10 @@ export default function Footer() {
         <div className="footer__col">
           <h4>Seguinos</h4>
           <div className="socials">
-            <a className="social" href="#" aria-label="Instagram">IG</a>
+            <a className="social" href="https://www.instagram.com/canchaya_dsw" aria-label="Instagram">IG</a>
             <a className="social" href="#" aria-label="Facebook">FB</a>
             <a className="social" href="#" aria-label="X">X</a>
-            <a className="social" href="#" aria-label="WhatsApp">WA</a>
+            <a className="social" href="https://wa.me/5493412258954?text=Hola%2C%20Tengo%20una%20consulta." aria-label="WhatsApp">WSP</a>
           </div>
         </div>
       </div>
