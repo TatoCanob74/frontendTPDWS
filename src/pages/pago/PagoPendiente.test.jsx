@@ -25,7 +25,8 @@ const CONFIRMADA = Reserve.fromDTO({
   totalAmount: '6500.00',
   court: {
     idCourt: 6, typeCourt: 'PADEL', nameCourt: 'Punto Cordobes', hourlyPrice: '6500.00',
-    location: { idLocation: 3, nomLocation: 'Cordoba' }
+    idComplex: 3,
+    complex: { idComplex: 3, nameComplex: 'Córdoba Racket Club', idLocation: 3, location: { idLocation: 3, nomLocation: 'Cordoba' } }
   },
   horary: { idHorary: 13, startTime: '20:00:00', endTime: '21:00:00', day: 'Viernes' },
   services: [{ idService: 1, nameService: 'Parrilla', priceService: '100.00' }]

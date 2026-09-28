@@ -28,12 +28,18 @@ const CAMPUS_ROSARIO = {
   hourlyPrice: '5000.00',
   stateCourt: 'DISPONIBLE',
   capacityPlayers: 10,
-  idLocateCourt: 1,
+  idComplex: 1,
   horaries: [
     { idHorary: 1, startTime: '10:00:00', endTime: '11:00:00', day: 'Martes' },
     { idHorary: 39, startTime: '19:00:00', endTime: '20:00:00', day: 'Jueves' }
   ],
-  location: { idLocation: 1, nomLocation: 'Rosario' }
+  // Forma nueva del backend: la localidad viene dentro del complejo
+  complex: {
+    idComplex: 1,
+    nameComplex: 'Rosario Sport Center',
+    idLocation: 1,
+    location: { idLocation: 1, nomLocation: 'Rosario' }
+  }
 }
 
 const LOCATIONS = [

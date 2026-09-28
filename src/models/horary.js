@@ -21,7 +21,7 @@ export function findShift(value) {
 }
 
 export class Horary {
-  constructor({ idHorary, idCourt, startTime, endTime, day, courtName = null, hourlyPrice = null }) {
+  constructor({ idHorary, idCourt, startTime, endTime, day, courtName = null, hourlyPrice = null, complexName = null }) {
     this.idHorary = idHorary
     this.idCourt = idCourt
     this.startTime = startTime
@@ -29,6 +29,7 @@ export class Horary {
     this.day = day
     this.courtName = courtName
     this.hourlyPrice = hourlyPrice
+    this.complexName = complexName
   }
 
   static fromDTO(dto) {

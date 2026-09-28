@@ -11,7 +11,13 @@ import CourtsTab from './CourtsTab'
 import HorariesTab from './HorariesTab'
 import LocationsTab from './LocationsTab'
 import ServicesTab from './ServicesTab'
+import ComplexesTab from './ComplexesTab'
+import AdminsTab from './AdminsTab'
+import MyComplexTab from './MyComplexTab'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
+import { useAuth } from '../../hooks/useAuth'
+import { getMyComplex } from '../../api/complexes'
+import { isSuperAdminRole } from '../../utils/roles'
 
 function messageFrom(err, fallback) {
   return err.response?.data?.error || err.response?.data?.message || fallback
@@ -326,27 +332,101 @@ function ReservesTab() {
   )
 }
 
+// Pestañas de cada nivel. El superadmin gestiona toda la plataforma; el admin de complejo,
+// solo lo suyo. Ocultar pestañas es comodidad: si alguien fuerza la llamada, el backend
+// igual responde 403.
+const SUPERADMIN_TABS = [
+  { id: 'complejos', label: 'Complejos' },
+  { id: 'admins', label: 'Administradores' },
+  { id: 'canchas', label: 'Canchas' },
+  { id: 'horarios', label: 'Horarios' },
+  { id: 'localidades', label: 'Localidades' },
+  { id: 'servicios', label: 'Servicios' },
+  { id: 'usuarios', label: 'Usuarios' },
+  { id: 'reservas', label: 'Reservas' }
+]
+
+const ADMIN_TABS = [
+  { id: 'mi-complejo', label: 'Mi complejo' },
+  { id: 'canchas', label: 'Canchas' },
+  { id: 'horarios', label: 'Horarios' },
+  { id: 'reservas', label: 'Reservas' }
+]
+
 export default function Admin() {
-  const [tab, setTab] = useState('canchas')
+  const { user } = useAuth()
+  const isSuperAdmin = isSuperAdminRole(user?.typeUser)
+  const tabs = isSuperAdmin ? SUPERADMIN_TABS : ADMIN_TABS
+  const [tab, setTab] = useState(tabs[0].id)
+
+  // Solo para el admin de complejo: undefined = cargando, null = no tiene complejo asignado
+  const [myComplex, setMyComplex] = useState(undefined)
+  const [complexError, setComplexError] = useState(null)
+
+  const loadMyComplex = useCallback(() => {
+    return getMyComplex()
+      .then((cx) => {
+        setMyComplex(cx)
+        setComplexError(null)
+      })
+      .catch(() => {
+        setMyComplex(null)
+        setComplexError('No pudimos cargar tu complejo.')
+      })
+  }, [])
+
+  useEffect(() => {
+    if (!isSuperAdmin) loadMyComplex()
+  }, [isSuperAdmin, loadMyComplex])
+
+  const header = (
+    <div className="section-head">
+      <span className="eyebrow">{isSuperAdmin ? 'Panel de superadministrador' : 'Panel de complejo'}</span>
+      <h2>{isSuperAdmin ? 'Administración' : myComplex?.nameComplex ?? 'Mi complejo'}</h2>
+      <p>
+        {isSuperAdmin
+          ? 'Gestioná complejos, administradores, canchas, horarios, localidades, servicios, usuarios y reservas de CanchaYa.'
+          : 'Gestioná las canchas, los horarios y las reservas de tu complejo.'}
+      </p>
+    </div>
+  )
+
+  if (!isSuperAdmin && myComplex === undefined) {
+    return (
+      <section className="section shell">
+        {header}
+        <p className="hint">Cargando tu complejo…</p>
+      </section>
+    )
+  }
+
+  if (!isSuperAdmin && !myComplex) {
+    return (
+      <section className="section shell">
+        {header}
+        <div className="alert alert--error" role="alert">
+          {complexError ?? 'Todavía no tenés un complejo asignado. Pedile al superadministrador que te asigne uno.'}
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="section shell">
-      <div className="section-head">
-        <span className="eyebrow">Panel</span>
-        <h2>Administración</h2>
-        <p>Gestioná canchas, horarios, localidades, servicios, usuarios y reservas de CanchaYa.</p>
-      </div>
+      {header}
 
       <div className="tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={tab === 'canchas'} onClick={() => setTab('canchas')}>Canchas</button>
-        <button type="button" role="tab" aria-selected={tab === 'horarios'} onClick={() => setTab('horarios')}>Horarios</button>
-        <button type="button" role="tab" aria-selected={tab === 'localidades'} onClick={() => setTab('localidades')}>Localidades</button>
-        <button type="button" role="tab" aria-selected={tab === 'servicios'} onClick={() => setTab('servicios')}>Servicios</button>
-        <button type="button" role="tab" aria-selected={tab === 'usuarios'} onClick={() => setTab('usuarios')}>Usuarios</button>
-        <button type="button" role="tab" aria-selected={tab === 'reservas'} onClick={() => setTab('reservas')}>Reservas</button>
+        {tabs.map((t) => (
+          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}>
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {tab === 'canchas' && <CourtsTab />}
+      {tab === 'complejos' && <ComplexesTab />}
+      {tab === 'admins' && <AdminsTab />}
+      {tab === 'mi-complejo' && <MyComplexTab complex={myComplex} onUpdated={loadMyComplex} />}
+      {tab === 'canchas' && <CourtsTab myComplex={isSuperAdmin ? null : myComplex} />}
       {tab === 'horarios' && <HorariesTab />}
       {tab === 'localidades' && <LocationsTab />}
       {tab === 'servicios' && <ServicesTab />}

@@ -272,11 +272,12 @@ export default function BookingForm() {
               type="button"
               className="chip slot"
               aria-pressed={idHorary === h.idHorary}
-              aria-label={[h.start, h.courtName, h.formattedPrice].filter(Boolean).join(', ')}
+              aria-label={[h.start, h.complexName, h.courtName, h.formattedPrice].filter(Boolean).join(', ')}
               onClick={() => setIdHorary(h.idHorary === idHorary ? null : h.idHorary)}
             >
               {h.start}
               {h.courtName && <small className="slot__court">{h.courtName}</small>}
+              {h.complexName && <small className="slot__complex">{h.complexName}</small>}
               {h.formattedPrice && <small className="slot__price">{h.formattedPrice}</small>}
             </button>
           ))}
@@ -337,6 +338,7 @@ export default function BookingForm() {
             <div className="detail-list__row">
               <span>
                 Cancha{selectedHorario.courtName ? ` · ${selectedHorario.courtName}` : ''}
+                {selectedHorario.complexName ? ` · ${selectedHorario.complexName}`: ''}
                 {' · '}
                 {selectedHorario.label}
               </span>
@@ -358,7 +360,7 @@ export default function BookingForm() {
           <span className="summary__value">
             {[SPORTS.find((s) => s.value === sport)?.label, date, day].filter(Boolean).join(' · ')}
             {selectedHorario
-              ? ` · ${selectedHorario.label}${selectedHorario.courtName ? ` · ${selectedHorario.courtName}` : ''}`
+              ? ` · ${selectedHorario.label}${selectedHorario.courtName ? ` · ${selectedHorario.courtName}` : ''}${selectedHorario.complexName ? ` · ${selectedHorario.complexName}` : ''}`
               : ' · elegí un horario'}
           </span>
         </div>

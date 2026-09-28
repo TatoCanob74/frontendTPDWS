@@ -75,6 +75,10 @@ export class Reserve {
     return this.court?.typeLabel ?? null
   }
 
+  get complexName() {
+  return this.court?.complexName ?? null
+  }
+
   get scheduleLabel() {
     return this.horary?.label ?? null
   }

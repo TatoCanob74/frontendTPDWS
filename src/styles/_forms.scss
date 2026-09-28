@@ -183,6 +183,16 @@
     white-space: nowrap;
   }
 
+  &__complex {
+    font-size: 10.5px;
+    font-weight: 600;
+    opacity: 0.7;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   &__price {
     font-size: 11px;
     font-weight: 700;
@@ -196,6 +206,10 @@
     color: #fff;
 
     .slot__court {
+      opacity: 0.9;
+    }
+
+    .slot__complex {
       opacity: 0.9;
     }
 

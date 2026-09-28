@@ -4,15 +4,16 @@ import {
   createCourt,
   updateCourt,
   toggleCourtState,
-  deleteCourt,
-  getLocations
+  deleteCourt
 } from '../../api/courts'
+import { getComplexes } from '../../api/complexes'
 import CourtForm from '../../components/courtForm/CourtForm'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
-export default function CourtsTab() {
+// myComplex: el complejo del admin logueado; null cuando es el superadmin (ve todos)
+export default function CourtsTab({ myComplex = null }) {
   const [courts, setCourts] = useState([])
-  const [locations, setLocations] = useState([])
+  const [complexes, setComplexes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
@@ -34,11 +35,14 @@ export default function CourtsTab() {
   useEffect(() => {
     Promise.all([
       loadCourts(),
-      getLocations()
-        .then(setLocations)
-        .catch(() => setLocations([]))
+      // El admin no elige complejo, así que solo el superadmin necesita la lista
+      myComplex
+        ? Promise.resolve()
+        : getComplexes()
+            .then(setComplexes)
+            .catch(() => setComplexes([]))
     ]).finally(() => setLoading(false))
-  }, [loadCourts])
+  }, [loadCourts, myComplex])
 
   function messageFrom(err, fallback) {
     return err.response?.data?.error || err.response?.data?.message || fallback
@@ -99,7 +103,8 @@ export default function CourtsTab() {
       <CourtForm
         key={editing === 'new' ? 'new' : editing.idCourt}
         court={editing === 'new' ? null : editing}
-        locations={locations}
+        complexes={complexes}
+        lockedComplex={myComplex}
         submitting={submitting}
         error={formError}
         onSubmit={handleSubmit}
@@ -129,7 +134,7 @@ export default function CourtsTab() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th><th>Nombre</th><th>Deporte</th><th>Sede</th><th>Precio</th>
+                <th>ID</th><th>Nombre</th><th>Deporte</th>{!myComplex && <th>Complejo</th>}<th>Sede</th><th>Precio</th>
                 <th>Capacidad</th><th>Estado</th><th>Acciones</th>
               </tr>
             </thead>
@@ -139,6 +144,7 @@ export default function CourtsTab() {
                   <td>{court.idCourt}</td>
                   <td>{court.nameCourt}</td>
                   <td>{court.typeIcon} {court.typeLabel}</td>
+                  {!myComplex && <td>{court.complexName ?? <span className="hint">sin complejo</span>}</td>}
                   <td>{court.locationName ?? <span className="hint">sin sede</span>}</td>
                   <td>{court.formattedPrice}</td>
                   <td>{court.capacityPlayers}</td>

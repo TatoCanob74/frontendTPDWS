@@ -7,6 +7,7 @@ import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
 
 export default function HorariesTab() {
   const [courts, setCourts] = useState([])
+  const [courtsLoaded, setCourtsLoaded] = useState(false)
   const [filterCourt, setFilterCourt] = useState('')
   const [filterDay, setFilterDay] = useState('')
   const [filterShift, setFilterShift] = useState('')
@@ -26,6 +27,7 @@ export default function HorariesTab() {
     getCourtsForAdmin()
       .then(setCourts)
       .catch(() => setCourts([]))
+      .finally(() => setCourtsLoaded(true))
   }, [])
 
   useEffect(() => {
@@ -51,8 +53,13 @@ export default function HorariesTab() {
     }
   }, [filterKey, filterCourt, filterDay, filterShift])
 
-  const loading = result.key !== filterKey
-  const horaries = result.key === filterKey ? result.horaries : []
+  const loading = result.key !== filterKey || !courtsLoaded
+  // GET /horarios es público y devuelve los de todos los complejos. Se muestran solo los de
+  // las canchas que este usuario administra (courts ya viene filtrado por el backend).
+  const courtIds = new Set(courts.map((c) => String(c.idCourt)))
+  const horaries = result.key === filterKey
+    ? result.horaries.filter((h) => courtIds.has(String(h.idCourt)))
+    : []
   const loadError = result.key === filterKey ? result.error : null
 
   function messageFrom(err, fallback) {
@@ -135,7 +142,7 @@ export default function HorariesTab() {
         </button>
       </div>
 
-      {courts.length === 0 && (
+      {courtsLoaded && courts.length === 0 && (
         <p className="hint">Cargá al menos una cancha antes de definir horarios.</p>
       )}
 

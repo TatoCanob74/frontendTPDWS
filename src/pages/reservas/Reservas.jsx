@@ -87,6 +87,7 @@ export default function Reservas() {
               <div>
                 <strong>{r.courtLabel ?? `Cancha #${r.idCourt}`}</strong> · {r.dateReserve}
                 {r.scheduleLabel ? ` · ${r.scheduleLabel}` : ''}
+                {r.complexName ? ` · ${r.complexName}`: ''}
                 {r.paymentLabel && <div className="hint">{r.paymentLabel}</div>}
               </div>
               <div>{r.formattedAmount}</div>

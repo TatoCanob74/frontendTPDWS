@@ -6,7 +6,7 @@ const emptyForm = {
   nameCourt: '',
   hourlyPrice: '',
   capacityPlayers: '',
-  idLocateCourt: ''
+  idComplex: ''
 }
 
 function toFormState(court) {
@@ -16,13 +16,14 @@ function toFormState(court) {
     nameCourt: court.nameCourt,
     hourlyPrice: String(court.hourlyPrice),
     capacityPlayers: String(court.capacityPlayers),
-    idLocateCourt: String(court.idLocateCourt)
+    idComplex: String(court.idComplex)
   }
 }
 
 export default function CourtForm({
   court = null,
-  locations = [],
+  complexes = [],
+  lockedComplex = null,
   submitting = false,
   error = null,
   onSubmit,
@@ -37,13 +38,15 @@ export default function CourtForm({
 
   function handleSubmit(e) {
     e.preventDefault()
-    onSubmit({
+    const payload = {
       typeCourt: form.typeCourt,
       nameCourt: form.nameCourt.trim(),
       hourlyPrice: Number(form.hourlyPrice),
-      capacityPlayers: Number(form.capacityPlayers),
-      idLocateCourt: Number(form.idLocateCourt)
-    })
+      capacityPlayers: Number(form.capacityPlayers)
+    }
+    // El admin de un complejo no elige: el backend usa el suyo
+    if (!lockedComplex) payload.idComplex = Number(form.idComplex)
+    onSubmit(payload)
   }
 
   return (
@@ -110,25 +113,32 @@ export default function CourtForm({
         </div>
       </div>
 
-      <div className="field">
-        <label className="field__label" htmlFor="idLocateCourt">Sede</label>
-        <select
-          className="input"
-          id="idLocateCourt"
-          name="idLocateCourt"
-          required
-          value={form.idLocateCourt}
-          onChange={handleChange}
-        >
-          <option value="">Elegí una sede</option>
-          {locations.map((loc) => (
-            <option key={loc.idLocation} value={loc.idLocation}>{loc.nomLocation}</option>
-          ))}
-        </select>
-        {locations.length === 0 && (
-          <p className="hint">No hay sedes cargadas todavía.</p>
-        )}
-      </div>
+      {lockedComplex ? (
+        <div className="summary">
+          <span className="summary__label">Complejo</span>
+          <span className="summary__value">{lockedComplex.label}</span>
+        </div>
+      ) : (
+        <div className="field">
+          <label className="field__label" htmlFor="idComplex">Complejo</label>
+          <select
+            className="input"
+            id="idComplex"
+            name="idComplex"
+            required
+            value={form.idComplex}
+            onChange={handleChange}
+          >
+            <option value="">Elegí un complejo</option>
+            {complexes.map((cx) => (
+              <option key={cx.idComplex} value={cx.idComplex}>{cx.label}</option>
+            ))}
+          </select>
+          {complexes.length === 0 && (
+            <p className="hint">No hay complejos cargados todavía. Creá uno en la pestaña Complejos.</p>
+          )}
+        </div>
+      )}
 
       {error && <div className="alert alert--error" role="alert">{error}</div>}
 

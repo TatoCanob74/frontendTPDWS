@@ -4,6 +4,7 @@ import { useHeroParticles } from '../../hooks/useHeroParticles'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
 import SportCard from '../../components/sportCard/SportCard'
 import { useAuth } from '../../hooks/useAuth'
+import { isAdminRole } from '../../utils/roles'
 
 const SPORTS = [
   {
@@ -62,7 +63,7 @@ export default function Home() {
             Disponibilidad en tiempo real, sin llamadas ni esperas.
           </p>
           <div className="hero__actions" data-reveal>
-            {user?.typeUser != 'ADMIN' && (
+            {!isAdminRole(user?.typeUser) && (
             <Link className="btn btn--light" to="/canchas">Reservar cancha</Link>
             )}
             <a className="btn btn--ghost" href="#deportes">Ver deportes</a>

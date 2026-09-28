@@ -5,6 +5,7 @@ export default function ReserveDetail({ reserve }) {
     ['Deporte', reserve.courtLabel],
     ['Cancha', reserve.court?.nameCourt],
     ['Sede', reserve.court?.locationName],
+    ['Complejo', reserve.court?.complexName],
     ['Fecha', reserve.dateReserve],
     ['Horario', reserve.scheduleLabel]
   ].filter(([, value]) => Boolean(value))

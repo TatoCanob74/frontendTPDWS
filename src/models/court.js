@@ -1,4 +1,5 @@
 import { Horary } from './horary.js'
+import { Complex } from './complex.js'
 import { formatCurrency } from '../utils/currency.js'
 
 export const COURT_TYPES = [
@@ -15,9 +16,9 @@ export class Court {
     hourlyPrice,
     stateCourt,
     capacityPlayers,
-    idLocateCourt,
-    horaries = [],
-    location = null
+    idComplex,
+    complex = null,
+    horaries = []
   }) {
     this.idCourt = idCourt
     this.typeCourt = typeCourt
@@ -25,9 +26,23 @@ export class Court {
     this.hourlyPrice = hourlyPrice
     this.stateCourt = stateCourt
     this.capacityPlayers = capacityPlayers
-    this.idLocateCourt = idLocateCourt
+    this.idComplex = idComplex
+    this.complex = complex ? Complex.fromDTO(complex) : null
     this.horaries = Horary.fromList(horaries)
-    this.location = location
+  }
+
+  // La cancha ya no guarda su localidad: la hereda del complejo. Estos dos getters
+  // mantienen la misma "forma" que antes, así las pantallas del cliente no cambian.
+  get location() {
+    return this.complex?.location ?? null
+  }
+
+  get idLocateCourt() {
+    return this.complex?.idLocation ?? null
+  }
+
+  get complexName() {
+    return this.complex?.nameComplex ?? null
   }
 
   static fromDTO(dto) {
@@ -62,7 +77,7 @@ export class Court {
     return this.horaries
       .filter((h) => h.day === day)
       .map((h) =>
-        Horary.fromDTO({ ...h, courtName: this.nameCourt, hourlyPrice: this.hourlyPrice })
+        Horary.fromDTO({ ...h, courtName: this.nameCourt, hourlyPrice: this.hourlyPrice, complexName: this.complexName })
       )
   }
 
@@ -72,7 +87,7 @@ export class Court {
       nameCourt: this.nameCourt,
       hourlyPrice: this.hourlyPrice,
       capacityPlayers: this.capacityPlayers,
-      idLocateCourt: this.idLocateCourt
+      idComplex: this.idComplex
     }
   }
 }

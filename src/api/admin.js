@@ -1,5 +1,6 @@
 import { client } from './client'
 import { Reserve } from '../models/reserve'
+import { User } from '../models/user'
 
 export function getUsers() {
   return client.get('/seeUsers').then((r) => r.data)
@@ -26,4 +27,13 @@ export function updateReserveState(idReserve, stateReserva) {
 
 export function deleteReserve(idReserve) {
   return client.delete(`/reservas/${idReserve}`).then((r) => r.data)
+}
+
+// Administradores de complejo (solo superadmin)
+export function getAdmins() {
+  return client.get('/admins').then((r) => User.fromList(r.data))
+}
+
+export function createAdmin(payload) {
+  return client.post('/admins', payload).then((r) => r.data)
 }
