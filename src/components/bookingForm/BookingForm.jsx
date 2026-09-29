@@ -32,6 +32,7 @@ export default function BookingForm() {
 
   const [sport, setSport] = useState(params.get('deporte') || 'futbol')
   const [date, setDate] = useState(todayIso())
+  const [idComplex, setIdComplex] = useState('')
   const [idLocateCourt, setIdLocateCourt] = useState('')
   const [idHorary, setIdHorary] = useState(null)
   const [selectedServices, setSelectedServices] = useState([])
@@ -88,14 +89,27 @@ export default function BookingForm() {
     [courts, idLocateCourt]
   )
 
+  const complexesInLocation = useMemo(() => {
+    const byId = new Map()
+    for (const court of courtsInLocation) {
+      if (court.complex) byId.set(court.complex.idComplex, court.complex)
+    }
+    return [...byId.values()]
+  }, [courtsInLocation])
+
+  const courtsInComplex = useMemo(
+    () => courtsInLocation.filter((c) => String(c.idComplex) === String(idComplex)),
+    [courtsInLocation, idComplex]
+  )
+
   const horarios = useMemo(
-    () => (day ? courtsInLocation.flatMap((c) => c.horariesForDay(day)) : []),
-    [courtsInLocation, day]
+    () => (day ? courtsInComplex.flatMap((c) => c.horariesForDay(day)) : []),
+    [courtsInComplex, day]
   )
 
   const daysWithSlots = useMemo(
-    () => DAYS.filter((d) => courtsInLocation.some((c) => c.horariesForDay(d).length > 0)),
-    [courtsInLocation]
+    () => DAYS.filter((d) => courtsInComplex.some((c) => c.horariesForDay(d).length > 0)),
+    [courtsInComplex]
   )
 
   const locationsWithSport = useMemo(
@@ -103,7 +117,7 @@ export default function BookingForm() {
     [locations, locationHasSport]
   )
 
-  const ready = Boolean(idLocateCourt) && Boolean(day) && !courtsLoading && !courtsError
+  const ready = Boolean(idLocateCourt) && Boolean(day) && Boolean(idComplex) && !courtsLoading && !courtsError
 
   const visibleHorarios = horarios.filter((h) => h.matchesShift(shift))
 
@@ -188,6 +202,17 @@ export default function BookingForm() {
     }
   }
 
+  function handleLocationChange(e) {
+    setIdLocateCourt(e.target.value)
+    setIdComplex('')
+    setIdHorary(null)
+  }
+
+  function handleComplexChange(e) {
+    setIdComplex(e.target.value)
+    setIdHorary(null)
+  }
+
   return (
     <form className="booking" onSubmit={handleSubmit} noValidate>
       <div className="field">
@@ -215,7 +240,7 @@ export default function BookingForm() {
             className="input"
             id="idLocateCourt"
             value={idLocateCourt}
-            onChange={(e) => setIdLocateCourt(e.target.value)}
+            onChange={handleLocationChange}
           >
             <option value="">Elegí una sede</option>
             {locations.map((loc) => {
@@ -229,6 +254,25 @@ export default function BookingForm() {
             })}
           </select>
           {locationsError && <p className="hint">Las sedes todavía no están disponibles.</p>}
+        </div>
+        <div className="field">
+          <label className="field__label" htmlFor="idComplex">Complejo</label>
+          <select
+            className="input"
+            id="idComplex"
+            value={idComplex}
+            disabled = {!idLocateCourt}
+            onChange={handleComplexChange}
+          >
+            <option value="">Elegí un Complejo</option>
+            {complexesInLocation.map((c) => {
+              return (
+                <option key={c.idComplex} value={c.idComplex}>
+                  {c.nameComplex}
+                </option>
+              )
+            })}
+          </select>
         </div>
         <div className="field">
           <label className="field__label" htmlFor="fecha">Fecha</label>
@@ -283,9 +327,10 @@ export default function BookingForm() {
           ))}
         </div>
         {!idLocateCourt && <p className="hint">Elegí una sede para ver los horarios.</p>}
-        {idLocateCourt && !day && <p className="hint">Elegí una fecha para ver los horarios.</p>}
-        {idLocateCourt && day && courtsLoading && <p className="hint">Buscando horarios…</p>}
-        {idLocateCourt && day && !courtsLoading && courtsError && (
+        {idLocateCourt && !day && !idComplex && <p className="hint">Elegí un complejo para ver los horarios.</p>}
+        {idLocateCourt && !day && !idComplex && <p className="hint">Elegí una fecha para ver los horarios.</p>}
+        {idLocateCourt && day && idComplex && courtsLoading && <p className="hint">Buscando horarios…</p>}
+        {idLocateCourt && day && idComplex && !courtsLoading && courtsError && (
           <p className="hint">Los horarios todavía no están disponibles.</p>
         )}
 
