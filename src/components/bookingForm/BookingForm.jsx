@@ -119,6 +119,9 @@ export default function BookingForm() {
 
   const ready = Boolean(idLocateCourt) && Boolean(day) && Boolean(idComplex) && !courtsLoading && !courtsError
 
+  const readyTwo = Boolean(idLocateCourt) && Boolean(day) && !courtsLoading && !courtsError
+
+
   const visibleHorarios = horarios.filter((h) => h.matchesShift(shift))
 
   const selectedHorario = horarios.find((h) => h.idHorary === idHorary)
@@ -327,14 +330,14 @@ export default function BookingForm() {
           ))}
         </div>
         {!idLocateCourt && <p className="hint">Elegí una sede para ver los horarios.</p>}
-        {idLocateCourt && !day && !idComplex && <p className="hint">Elegí un complejo para ver los horarios.</p>}
-        {idLocateCourt && !day && !idComplex && <p className="hint">Elegí una fecha para ver los horarios.</p>}
+        {idLocateCourt && !idComplex && <p className="hint">Elegí un complejo para ver los horarios.</p>}
+        {idLocateCourt && !day && idComplex && <p className="hint">Elegí una fecha para ver los horarios.</p>}
         {idLocateCourt && day && idComplex && courtsLoading && <p className="hint">Buscando horarios…</p>}
         {idLocateCourt && day && idComplex && !courtsLoading && courtsError && (
           <p className="hint">Los horarios todavía no están disponibles.</p>
         )}
 
-        {ready && courtsInLocation.length === 0 && (
+        {readyTwo && courtsInLocation.length === 0 && (
           <p className="hint">
             {`Esta sede no tiene canchas de ${sportLabel}.`}
             {locationsWithSport.length > 0 &&

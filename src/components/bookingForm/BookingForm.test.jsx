@@ -66,9 +66,12 @@ function renderForm() {
   )
 }
 
-async function pick(user, { sede, fecha }) {
+async function pick(user, { sede, fecha, complejo }) {
   await screen.findByRole('option', { name: /Rosario/ })
   await user.selectOptions(screen.getByLabelText('Sede'), sede)
+  if (complejo) {
+    await user.selectOptions(screen.getByLabelText('Complejo'), complejo)
+  }
   await user.clear(screen.getByLabelText('Fecha'))
   await user.type(screen.getByLabelText('Fecha'), fecha)
 }
@@ -77,7 +80,7 @@ describe('BookingForm', () => {
   it('lista los horarios del día con su precio', async () => {
     const user = userEvent.setup()
     renderForm()
-    await pick(user, { sede: '1', fecha: '2026-09-10' })  // jueves
+    await pick(user, { sede: '1', complejo: '1', fecha: '2026-09-10' })  // jueves
 
     const slot = await screen.findByRole('button', { name: /19:00/ })
     expect(slot).toHaveTextContent('Campus Rosario')
@@ -87,7 +90,7 @@ describe('BookingForm', () => {
   it('muestra el total antes de confirmar, sumando los servicios elegidos', async () => {
     const user = userEvent.setup()
     renderForm()
-    await pick(user, { sede: '1', fecha: '2026-09-10' })
+    await pick(user, { sede: '1', complejo: '1', fecha: '2026-09-10' })
 
     await user.click(await screen.findByRole('button', { name: /19:00/ }))
     const total = () => screen.getByText('Total a pagar').nextSibling.textContent
@@ -100,7 +103,7 @@ describe('BookingForm', () => {
   it('cuando el día elegido no tiene turnos, dice cuáles sí los tienen', async () => {
     const user = userEvent.setup()
     renderForm()
-    await pick(user, { sede: '1', fecha: '2026-09-09' })
+    await pick(user, { sede: '1', complejo: '1', fecha: '2026-09-09' })
 
     const hint = await screen.findByText(/No hay horarios de fútbol/)
     expect(hint).toHaveTextContent('Días con turnos: Martes, Jueves')
