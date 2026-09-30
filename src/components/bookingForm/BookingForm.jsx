@@ -30,7 +30,7 @@ export default function BookingForm() {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
-  const [sport, setSport] = useState(params.get('deporte') || 'futbol')
+  const [sport, setSport] = useState(params.get('deporte') || '')
   const [date, setDate] = useState(todayIso())
   const [idComplex, setIdComplex] = useState('')
   const [idLocateCourt, setIdLocateCourt] = useState('')
