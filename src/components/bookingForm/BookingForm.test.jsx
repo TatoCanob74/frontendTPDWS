@@ -66,10 +66,18 @@ function renderForm() {
   )
 }
 
+// El formulario arranca sin deporte elegido: el usuario lo elige primero
+async function elegirFutbol(user) {
+  await user.click(screen.getByRole('button', { name: /Fútbol/ }))
+}
+
 async function pick(user, { sede, fecha, complejo }) {
+  await elegirFutbol(user)
   await screen.findByRole('option', { name: /Rosario/ })
   await user.selectOptions(screen.getByLabelText('Sede'), sede)
   if (complejo) {
+    // Las opciones de complejo salen de las canchas, que llegan de forma asíncrona
+    await screen.findByRole('option', { name: 'Rosario Sport Center' })
     await user.selectOptions(screen.getByLabelText('Complejo'), complejo)
   }
   await user.clear(screen.getByLabelText('Fecha'))
@@ -118,8 +126,18 @@ describe('BookingForm', () => {
     expect(hint).toHaveTextContent('Sí hay en: Rosario')
   })
 
-  it('marca en el desplegable las sedes sin canchas del deporte elegido', async () => {
+  it('arranca sin ningún deporte elegido', async () => {
     renderForm()
+    await screen.findByRole('option', { name: /Rosario/ })
+    for (const deporte of [/Fútbol/, /Tenis/, /Pádel/]) {
+      expect(screen.getByRole('button', { name: deporte })).toHaveAttribute('aria-pressed', 'false')
+    }
+  })
+
+  it('marca en el desplegable las sedes sin canchas del deporte elegido', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await elegirFutbol(user)
     expect(await screen.findByRole('option', { name: /Cordoba — sin canchas de fútbol/ })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Rosario' })).toBeInTheDocument()
   })
