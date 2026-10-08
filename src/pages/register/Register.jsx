@@ -48,7 +48,7 @@ export default function Register() {
     setLoading(true)
     try {
       await register({ ...form, dateUser: toBackendDate(form.dateUser), typeUser: 'CLIENTE' })
-      navigate('/login', { state: { registered: true } })
+      navigate('/verifyemail', { replace : true ,state: { emailUser: form.emailUser } })
     } catch (err) {
       setError(err.response?.data?.error || 'No pudimos crear tu cuenta. Intentá de nuevo.')
     } finally {

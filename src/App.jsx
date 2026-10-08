@@ -6,6 +6,9 @@ import AdminRoute from './routes/AdminRoute'
 import Home from './pages/home/Home'
 import Login from './pages/login/Login'
 import Register from './pages/register/Register'
+import VerifyEmail from './pages/verifyEmail/VerifyEmail'
+import ForgotPassword from './pages/forgotPassword/ForgotPassword'
+import ResetPassword from './pages/resetPassword/ResetPassword'
 import Canchas from './pages/canchas/Canchas'
 import Reservas from './pages/reservas/Reservas'
 import Perfil from './pages/perfil/Perfil'
@@ -24,6 +27,9 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verifyemail" element={<VerifyEmail />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/canchas" element={<Canchas />} />
             <Route path="/pago/exito" element={<PagoExito />} />
             <Route path="/pago/error" element={<PagoError />} />

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { resendCode } from '../../api/auth'
 
 export default function Login() {
   const { login } = useAuth()
@@ -9,6 +10,11 @@ export default function Login() {
   const [form, setForm] = useState({ emailUser: '', passwordUser: '' })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [needsVerification, setNeedsVerification] = useState(false)
+
+  const exitResetPassword = location.state?.passwordReset || false;
+
+  const emailVerified = location.state?.verifiedEmail || false;
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -18,16 +24,34 @@ export default function Login() {
     e.preventDefault()
     setError(null)
     setLoading(true)
+    setNeedsVerification(false)
     try {
       await login(form.emailUser, form.passwordUser)
       const redirectTo = location.state?.from?.pathname || '/canchas'
       navigate(redirectTo, { replace: true })
     } catch (err) {
-      setError(err.response?.data?.message || 'No pudimos iniciar sesión. Revisá tus datos.')
+      setError(err.response?.data?.message || err.response?.data?.error || 'No pudimos iniciar sesión. Revisá tus datos.')
+      if(err.response?.data?.code === 'EMAIL_NO_VERIFICADO'){
+        setNeedsVerification(true);
+      }
     } finally {
       setLoading(false)
     }
   }
+
+  const handleVerifyNow = async() => {
+      try {
+        setLoading(true);
+        await resendCode(form.emailUser);
+        
+        navigate('/verifyemail', { replace: true, state: { emailUser: form.emailUser } })
+  
+      } catch (err) {
+      setError(err.response?.data?.message || err.response?.data?.error || 'El reenvío del código falló.')
+      } finally {
+        setLoading(false)
+      }
+    };
 
   return (
     <section className="section shell">
@@ -63,9 +87,29 @@ export default function Login() {
             value={form.passwordUser}
             onChange={handleChange}
           />
+           <p className="hint">
+           <Link to="/forgotpassword">¿Olvidaste tu contraseña?</Link>
+           </p>
         </div>
 
+        {exitResetPassword && !error && <div
+          className="alert" role="status">
+          Contraseña actualizada. Ya podés iniciar sesión.
+        </div>
+        }
+
+        {emailVerified && !error && <div
+          className="alert" role="status">
+          Email verificado. Ya podés iniciar sesión.
+        </div>
+        }
+
         {error && <div className="alert alert--error" role="alert">{error}</div>}
+        {needsVerification && (
+        <button type="button" className="btn" onClick={handleVerifyNow}>
+          Verificar ahora
+        </button>
+        )}
 
         <div className="booking__foot">
           <span className="summary__label">¿No tenés cuenta? <Link to="/register">Registrate</Link></span>
