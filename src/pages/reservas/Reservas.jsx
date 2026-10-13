@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getMyReserves, cancelReserve, createPaymentPreference, syncPayments } from '../../api/reserves'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
+import ReserveDetailDialog from '../../components/reserveDetailDialog/ReserveDetailDialog'
 
 export default function Reservas() {
   const [reserves, setReserves] = useState([])
@@ -11,6 +12,8 @@ export default function Reservas() {
   const [cancellingId, setCancellingId] = useState(null)
   const [payingId, setPayingId] = useState(null)
   const [confirmingCancel, setConfirmingCancel] = useState(null)
+  const [detailId, setDetailId] = useState(null)
+  const closeDetail = useCallback(() => setDetailId(null), [])
 
   const load = useCallback(() => {
     return getMyReserves()
@@ -93,6 +96,9 @@ export default function Reservas() {
               <div>{r.formattedAmount}</div>
               <span className={`status-pill status-pill--${r.stateReserva}`}>{r.stateReserva}</span>
               <div className="row-actions">
+                <button className="btn btn--sm btn--outline" type="button" onClick={() => setDetailId(r.idReserve)}>
+                  Ver detalle
+                </button>
                 {r.canBePaid && (
                   <button
                     className="btn btn--sm btn--primary"
@@ -118,6 +124,8 @@ export default function Reservas() {
           ))}
         </div>
       )}
+
+      <ReserveDetailDialog idReserve={detailId} onClose={closeDetail} />
 
       <ConfirmDialog
         open={Boolean(confirmingCancel)}

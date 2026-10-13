@@ -27,7 +27,8 @@ export class Reserve {
     idHorary,
     court = null,
     horary = null,
-    services = []
+    services = [],
+    user = null
   }) {
     this.idReserve = idReserve
     this.dateReserve = dateReserve
@@ -41,6 +42,8 @@ export class Reserve {
     this.court = court ? Court.fromDTO(court) : null
     this.horary = horary ? Horary.fromDTO(horary) : null
     this.services = services
+    // Solo lo trae el detalle (GET /reservas/:id): quién hizo la reserva
+    this.user = user
   }
 
   static fromDTO(dto) {
@@ -77,6 +80,11 @@ export class Reserve {
 
   get complexName() {
   return this.court?.complexName ?? null
+  }
+
+  get clientName() {
+    if (!this.user) return null
+    return `${this.user.nameUser ?? ''} ${this.user.surnameUser ?? ''}`.trim()
   }
 
   get scheduleLabel() {

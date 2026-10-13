@@ -20,6 +20,10 @@ export function getMyReserves({ stateReserva } = {}) {
   ).then(Reserve.fromList)
 }
 
+export function getReserve(idReserve) {
+  return client.get(`/reservas/${idReserve}`).then((r) => Reserve.fromDTO(r.data))
+}
+
 export function cancelReserve(idReserve) {
   return client.patch(`/reservas/${idReserve}/cancelar`).then((r) => r.data)
 }

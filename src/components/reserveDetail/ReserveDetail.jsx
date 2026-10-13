@@ -2,6 +2,8 @@ export default function ReserveDetail({ reserve }) {
   if (!reserve) return null
 
   const rows = [
+    ['Cliente', reserve.clientName],
+    ['Email', reserve.user?.emailUser],
     ['Deporte', reserve.courtLabel],
     ['Cancha', reserve.court?.nameCourt],
     ['Sede', reserve.court?.locationName],
@@ -31,7 +33,7 @@ export default function ReserveDetail({ reserve }) {
       )}
 
       <div className="detail-list__row detail-list__row--total">
-        <span>Total pagado</span>
+        <span>{reserve.isPaid ? 'Total pagado' : 'Total'}</span>
         <span className="detail-list__value">{reserve.formattedAmount}</span>
       </div>
     </div>

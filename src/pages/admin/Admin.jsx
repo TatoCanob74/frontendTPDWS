@@ -15,6 +15,7 @@ import ComplexesTab from './ComplexesTab'
 import AdminsTab from './AdminsTab'
 import MyComplexTab from './MyComplexTab'
 import ConfirmDialog from '../../components/confirmDialog/ConfirmDialog'
+import ReserveDetailDialog from '../../components/reserveDetailDialog/ReserveDetailDialog'
 import { useAuth } from '../../hooks/useAuth'
 import { getMyComplex } from '../../api/complexes'
 import { isSuperAdminRole } from '../../utils/roles'
@@ -165,6 +166,8 @@ function ReservesTab() {
   const [updatingId, setUpdatingId] = useState(null)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [detailId, setDetailId] = useState(null)
+  const closeDetail = useCallback(() => setDetailId(null), [])
 
   const fetchReserves = useCallback(() => {
     return getReserves({ stateReserva: stateReserva || undefined, dateReserve: dateReserve || undefined })
@@ -290,6 +293,9 @@ function ReservesTab() {
                         <option value="confirmada">Confirmada</option>
                         <option value="cancelada">Cancelada</option>
                       </select>
+                      <button className="btn btn--sm btn--outline" type="button" onClick={() => setDetailId(r.idReserve)}>
+                        Ver detalle
+                      </button>
                       <button
                         className="btn btn--sm btn--danger"
                         type="button"
@@ -308,6 +314,8 @@ function ReservesTab() {
           </table>
         </div>
       )}
+
+      <ReserveDetailDialog idReserve={detailId} onClose={closeDetail} />
 
       <ConfirmDialog
         open={Boolean(confirmingDelete)}
