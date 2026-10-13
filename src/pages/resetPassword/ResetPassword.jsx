@@ -1,10 +1,9 @@
 import CodeInput from '../../components/codeInput/codeInput.jsx';
 import { useState } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { resetPassword } from '../../api/auth';
 
 export default function ResetPassword() {
-  const { resetPassword } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const emailUser = location.state?.email;
@@ -31,11 +30,11 @@ export default function ResetPassword() {
     setError(null);
 
     try {
-      await resetPassword(emailUser, code, password);
+      await resetPassword({ emailUser, code, newPassword: password });
 
       navigate('/login', { replace:true, state: {passwordReset : true }});
     } catch (error){
-      setError(error.response?.data?.error || "No se puedo restablecer la contraseña.");
+      setError(error.response?.data?.error || "No se pudo restablecer la contraseña.");
       setLoading(false);
     }
   };

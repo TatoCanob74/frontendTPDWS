@@ -21,5 +21,5 @@ export function forgotPassword(data) {
 }
 
 export function resetPassword(data) {
-  return client.post('/auth/resetpassword', data).then((r) => r.data)
+  return client.post('/auth/resetpass', data).then((r) => r.data)
 }

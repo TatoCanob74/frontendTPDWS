@@ -57,7 +57,7 @@ export default function VerifyEmail() {
     setError(null)
     setNotice(null)
     try {
-      await resendCode(emailUser)
+      await resendCode({ emailUser })
       setNotice('Te enviamos un código nuevo.')
       setSeconds(COOLDOWN_SECONDS)
     } catch (err) {

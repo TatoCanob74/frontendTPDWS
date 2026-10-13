@@ -42,7 +42,7 @@ export default function Login() {
   const handleVerifyNow = async() => {
       try {
         setLoading(true);
-        await resendCode(form.emailUser);
+        await resendCode({ emailUser: form.emailUser });
         
         navigate('/verifyemail', { replace: true, state: { emailUser: form.emailUser } })
   

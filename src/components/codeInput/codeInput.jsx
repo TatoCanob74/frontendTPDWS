@@ -10,7 +10,7 @@ export default function CodeInput({
     onChange(valueString);
 
     if(valueString.length >= 6){
-      onComplete(valueString)
+      onComplete?.(valueString)
     }
   }
 
