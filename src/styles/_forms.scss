@@ -151,6 +151,18 @@
   &--lg{
     padding: 9px 12px;
   }
+
+  // Código de verificación de 6 dígitos
+  &--code {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.4em;
+    text-align: center;
+  }
+
+  &--error {
+    border-color: #9a3324;
+  }
 }
 
 .slots {

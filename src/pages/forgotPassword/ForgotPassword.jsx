@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { forgotPassword } from "../../api/auth";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -8,8 +10,6 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -19,45 +19,57 @@ export default function ForgotPassword() {
   async function handleSubmit(e) {
     e.preventDefault()
 
-    try{
     if(!EMAIL_REGEX.test(email)){
       setError('Ingresá un formato de mail válido.');
-      return setLoading(false);
+      return;
     }
 
     setLoading(true)
     setError(null)
 
-    await forgotPassword({emailUser: email});
-    navigate('/resetpassword', {state: { email }})
-
+    try{
+      await forgotPassword({emailUser: email});
+      navigate('/resetpassword', {state: { email }})
     } catch (error){
-      setError(error.response?.data?.error || "Email ingresado incorrectamente.");
+      setError(error.response?.data?.error || "No pudimos enviar el código. Intentá de nuevo.");
       setLoading(false);
     }
   }
 
   return (
     <section className="section shell">
-        <form className="booking" onSubmit={handleSubmit} noValidate>
-          <div>Ingresar email para recuperación</div>
+      <div className="section-head">
+        <span className="eyebrow">Recuperar contraseña</span>
+        <h2>¿Olvidaste tu contraseña?</h2>
+        <p>Ingresá tu email y te mandamos un código para elegir una nueva.</p>
+      </div>
 
-          {error && <div className="alert alert--error">{error}</div>}
-          <div className="field">
-            <input
+      <form className="booking" onSubmit={handleSubmit} noValidate>
+        <div className="field">
+          <label className="field__label" htmlFor="forgotEmail">Email</label>
+          <input
+            className="input input--lg"
+            type="email"
+            id="forgotEmail"
+            autoComplete="email"
             value={email}
             onChange={handleEmailChange}
             disabled={loading}
-            />
-          </div>
+          />
+        </div>
 
+        {error && <div className="alert alert--error" role="alert">{error}</div>}
+
+        <div className="booking__foot">
+          <span className="summary__label"><Link to="/login">Volver al login</Link></span>
           <button
             className="btn btn--primary"
             type='submit'
             disabled = {loading}
           >
-            {loading ? 'Verificando...':'Verificar'}
+            {loading ? 'Enviando…' : 'Enviar código'}
           </button>
+        </div>
       </form>
     </section>
   );

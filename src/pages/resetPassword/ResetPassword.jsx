@@ -1,6 +1,6 @@
 import CodeInput from '../../components/codeInput/codeInput.jsx';
 import { useState } from 'react';
-import { useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { resetPassword } from '../../api/auth';
 
 export default function ResetPassword() {
@@ -21,9 +21,18 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(!(code.length === 6 && password.length >=8 && password === confirmPassword)){
-      setError("Código inválido o contraseña inválida.");
-      return 
+    // Un mensaje por problema: con uno genérico el usuario no sabe qué corregir
+    if (code.length !== 6) {
+      setError("El código tiene que tener 6 dígitos.");
+      return
+    }
+    if (password.length < 8) {
+      setError("La contraseña tiene que tener al menos 8 caracteres.");
+      return
+    }
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden.");
+      return
     }
 
     setLoading(true);
@@ -42,54 +51,62 @@ export default function ResetPassword() {
   return(
     <section className="section shell">
       <div className="section-head">
-        <h2>Reestablecer Contraseña</h2>
-        <p>Ingresa la nueva contraseña</p>
+        <span className="eyebrow">Recuperar contraseña</span>
+        <h2>Restablecer contraseña</h2>
+        <p>Ingresá el código que te mandamos a {emailUser} y elegí una contraseña nueva.</p>
+      </div>
 
-        <form className="booking" onSubmit={handleSubmit} noValidate>
+      <form className="booking" onSubmit={handleSubmit} noValidate>
+        <div className="field">
+          <label className="field__label" htmlFor="resetCode">Código de verificación</label>
+          <CodeInput
+            id="resetCode"
+            value={code}
+            onChange={(val) => { setCode(val); setError(null); }}
+            error={Boolean(error)}
+            disabled={loading}
+          />
+        </div>
 
-          {error && <div className="alert alert--error">{error}</div>}
-          
-          <div className="field">
-            <label>Código de verificación</label>
-            <CodeInput
-              value={code}
-              onChange={(val) => { setCode(val); setError(null); }}
-              disabled={loading}
-            />
-          </div>
+        <div className="field">
+          <label className="field__label" htmlFor="newPassword">Nueva contraseña</label>
+          <input
+            type="password"
+            id="newPassword"
+            autoComplete="new-password"
+            className="input input--lg"
+            value={password}
+            onChange={(e) => { setPassword(e.target.value); setError(null); }}
+            disabled={loading}
+          />
+        </div>
 
-          <div className="field">
-            <label>Nueva contraseña</label>
-            <input
-              type="password"
-              className="input input--lg"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(null); }}
-              disabled={loading}
-            />
-          </div>
+        <div className="field">
+          <label className="field__label" htmlFor="confirmPassword">Confirmar contraseña</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            autoComplete="new-password"
+            className="input input--lg"
+            value={confirmPassword}
+            onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
+            disabled={loading}
+          />
+        </div>
 
-          <div className="field">
-            <label>Confirmar contraseña</label>
-            <input
-              type="password"
-              className="input input--lg"
-              value={confirmPassword}
-              onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
-              disabled={loading}
-            />
-          </div>
+        {error && <div className="alert alert--error" role="alert">{error}</div>}
 
+        <div className="booking__foot">
+          <span className="summary__label"><Link to="/forgotpassword">Pedir otro código</Link></span>
           <button
             type="submit"
             className="btn btn--primary"
             disabled={loading}
           >
-            {loading ? 'Restableciendo...' : 'Restablecer Contraseña'}
+            {loading ? 'Restableciendo…' : 'Restablecer contraseña'}
           </button>
-
-        </form>
-      </div>
+        </div>
+      </form>
     </section>
   );
 }

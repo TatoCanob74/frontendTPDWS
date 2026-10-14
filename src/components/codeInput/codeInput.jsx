@@ -1,9 +1,9 @@
 export default function CodeInput({
-  value, disabled, error, onChange, onComplete
-}){ 
+  id, value, disabled, error, onChange, onComplete
+}){
 
   const handleChange = (e) => {
-    const rawValue = e.target.value;  
+    const rawValue = e.target.value;
 
     const valueString = rawValue.replace(/[^\d]/g, "");
 
@@ -15,7 +15,8 @@ export default function CodeInput({
   }
 
   return(
-    <input 
+    <input
+    id={id}
     type="text"
     inputMode="numeric"
     autoComplete="one-time-code"
@@ -23,7 +24,8 @@ export default function CodeInput({
     value={value}
     onChange={handleChange}
     disabled={disabled}
-    className={`form-control ${error ? 'border-danger text-danger' :''}`}
+    aria-invalid={Boolean(error)}
+    className={`input input--code ${error ? 'input--error' : ''}`}
   />
   );
 }

@@ -77,7 +77,9 @@ export default function VerifyEmail() {
         {error && <div className="alert alert--error" role="alert">{error}</div>}
 
         <div className="field">
+          <label className="field__label" htmlFor="verifyCode">Código de verificación</label>
           <CodeInput
+            id="verifyCode"
             value={code}
             onChange={handleCodeChange}
             onComplete={handleVerify}
