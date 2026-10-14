@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContext } from './authContextBase'
-import { getToken, setToken as persistToken } from '../api/client'
+import { getToken, setToken as persistToken, SESSION_EXPIRED_EVENT } from '../api/client'
 import { login as loginRequest, register as registerRequest } from '../api/auth'
 
 function decodePayload(token) {
@@ -51,9 +51,16 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => applyToken(null), [applyToken])
 
+  // El token vence a la hora: cuando el backend responde 401, el interceptor avisa y se cierra la sesión.
+  // Así PrivateRoute manda al login en vez de dejar al usuario en una pantalla donde todo falla.
+  useEffect(() => {
+    window.addEventListener(SESSION_EXPIRED_EVENT, logout)
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, logout)
+  }, [logout])
+
   const value = useMemo(
     () => ({ token, user, login, register, logout, isAuthenticated: Boolean(token) }),
-    [token, user, login,register, logout]
+    [token, user, login, register, logout]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

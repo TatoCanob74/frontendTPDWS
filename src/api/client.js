@@ -2,6 +2,9 @@ import axios from 'axios'
 
 const TOKEN_KEY = 'canchaya_token'
 
+// Lo escucha AuthContext: borrar el token del localStorage no alcanza, el estado de React también tiene que enterarse
+export const SESSION_EXPIRED_EVENT = 'canchaya:session-expired'
+
 export const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000'
 })
@@ -26,6 +29,7 @@ client.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       setToken(null)
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT))
     }
     return Promise.reject(error)
   }
