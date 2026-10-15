@@ -21,7 +21,8 @@ Ese es el link del repositorio donde tenemos el backend. El frontend necesita qu
 
 ## Documentación
 
-Toda la documentación del TP (proposal, minutas, seguimiento, evidencia de tests) está en la carpeta [docs](docs/README.md).
+- [Arquitectura del frontend](docs/arquitectura.md): pantallas y niveles de acceso, componentes, servicios, modelos y estilos.
+- [Índice de la documentación](docs/README.md): proposal, documentación de la API y evidencia de tests.
 
 ## Stack
 
