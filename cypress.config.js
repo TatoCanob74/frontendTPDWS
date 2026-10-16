@@ -6,7 +6,9 @@ export default defineConfig({
     baseUrl: 'http://localhost:5173',
     specPattern: 'cypress/e2e/**/*.cy.js',
     supportFile: false,
-    video: false,
+    // El video se graba solo con `npm run cy:run` (no con cy:open) y queda en cypress/videos
+    video: true,
+    videosFolder: 'cypress/videos',
     screenshotsFolder: 'cypress/screenshots',
   },
   // Credenciales de prueba: las crea `npm run e2e:seed` en el backend, solo en la base de test
