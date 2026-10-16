@@ -1,7 +1,7 @@
 import CodeInput from '../../components/codeInput/codeInput.jsx';
 import { useState } from 'react';
-import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { resetPassword } from '../../api/auth';
+import { useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { resetPassword, forgotPassword } from '../../api/auth';
 
 export default function ResetPassword() {
   const location = useLocation();
@@ -13,6 +13,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
   if (!emailUser){
     return <Navigate to="/forgotpassword" replace/>;
@@ -48,12 +49,28 @@ export default function ResetPassword() {
     }
   };
 
+  const handleResendCode = async () => {
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+
+    try {
+      // Llama a tu API que envía el email con el código
+      await forgotPassword({ email: emailUser }); 
+      setMessage("Te enviamos un nuevo código a tu email.");
+    } catch (error) {
+      setError(error.response?.data?.error || "Error al reenviar el código.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return(
     <section className="section shell">
       <div className="section-head">
         <span className="eyebrow">Recuperar contraseña</span>
         <h2>Restablecer contraseña</h2>
-        <p>Ingresá el código que te mandamos a {emailUser} y elegí una contraseña nueva.</p>
+        <p>Ingresá el código que te mandamos a {emailUser} e ingresa una contraseña nueva.</p>
       </div>
 
       <form className="booking" onSubmit={handleSubmit} noValidate>
@@ -95,16 +112,19 @@ export default function ResetPassword() {
         </div>
 
         {error && <div className="alert alert--error" role="alert">{error}</div>}
+        {message && <div className="alert alert--success" role="alert">{message}</div>}
 
         <div className="booking__foot">
-          <span className="summary__label"><Link to="/forgotpassword">Pedir otro código</Link></span>
-          <button
-            type="submit"
-            className="btn btn--primary"
-            disabled={loading}
-          >
-            {loading ? 'Restableciendo…' : 'Restablecer contraseña'}
-          </button>
+          <span className="summary__label">
+            <button
+              className="btn btn--secondary"
+              type="button"
+              onClick={handleResendCode}
+              disabled={loading}
+            > 
+              Pedir otro código
+            </button>
+          </span>
         </div>
       </form>
     </section>
