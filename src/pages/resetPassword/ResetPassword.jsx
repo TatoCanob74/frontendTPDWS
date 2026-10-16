@@ -55,8 +55,8 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      // Llama a tu API que envía el email con el código
-      await forgotPassword({ email: emailUser }); 
+      // El backend espera el campo emailUser (con "email" responde 400)
+      await forgotPassword({ emailUser });
       setMessage("Te enviamos un nuevo código a tu email.");
     } catch (error) {
       setError(error.response?.data?.error || "Error al reenviar el código.");
@@ -112,19 +112,26 @@ export default function ResetPassword() {
         </div>
 
         {error && <div className="alert alert--error" role="alert">{error}</div>}
-        {message && <div className="alert alert--success" role="alert">{message}</div>}
+        {message && !error && <div className="alert" role="status">{message}</div>}
 
         <div className="booking__foot">
           <span className="summary__label">
             <button
-              className="btn btn--secondary"
+              className="btn btn--outline"
               type="button"
               onClick={handleResendCode}
               disabled={loading}
-            > 
+            >
               Pedir otro código
             </button>
           </span>
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={loading}
+          >
+            {loading ? 'Restableciendo…' : 'Restablecer contraseña'}
+          </button>
         </div>
       </form>
     </section>
