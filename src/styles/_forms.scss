@@ -282,6 +282,35 @@
   }
 }
 
+// Botones de forma de pago: ocupan su propia fila debajo del total
+.pay-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 100%;
+
+  .btn {
+    flex: 1;
+  }
+
+  @include sm {
+    flex-direction: row;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+
+    small {
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0.85;
+    }
+  }
+}
+
 .summary {
   display: flex;
   flex-direction: column;

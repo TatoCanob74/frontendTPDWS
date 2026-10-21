@@ -5,6 +5,7 @@ import {
   deleteUser,
   getReserves,
   updateReserveState,
+  registerCashPayment,
   deleteReserve
 } from '../../api/admin'
 import CourtsTab from './CourtsTab'
@@ -166,6 +167,10 @@ function ReservesTab() {
   const [updatingId, setUpdatingId] = useState(null)
   const [confirmingDelete, setConfirmingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  // Reservas señadas: cobrar el resto en efectivo o marcar que no se presentó
+  const [confirmingCash, setConfirmingCash] = useState(null)
+  const [confirmingAbsent, setConfirmingAbsent] = useState(null)
+  const [settling, setSettling] = useState(false)
   const [detailId, setDetailId] = useState(null)
   const closeDetail = useCallback(() => setDetailId(null), [])
 
@@ -236,6 +241,35 @@ function ReservesTab() {
     }
   }
 
+  async function handleCashConfirmed() {
+    if (!confirmingCash) return
+
+    setSettling(true)
+    setNotice(null)
+    try {
+      const res = await registerCashPayment(confirmingCash.idReserve)
+      setNotice(res.message ?? 'Pago en efectivo registrado.')
+      await reload()
+    } catch (err) {
+      setResult((prev) => ({ ...prev, error: messageFrom(err, 'No pudimos registrar el pago en efectivo.') }))
+    } finally {
+      setSettling(false)
+      setConfirmingCash(null)
+    }
+  }
+
+  async function handleAbsentConfirmed() {
+    if (!confirmingAbsent) return
+
+    setSettling(true)
+    try {
+      await handleChangeState(confirmingAbsent, 'ausente')
+    } finally {
+      setSettling(false)
+      setConfirmingAbsent(null)
+    }
+  }
+
   const loading = result.key !== filterKey
   const reserves = result.key === filterKey ? result.reserves : []
   const error = result.key === filterKey ? result.error : null
@@ -250,6 +284,8 @@ function ReservesTab() {
             <option value="pendiente">Pendiente</option>
             <option value="confirmada">Confirmada</option>
             <option value="cancelada">Cancelada</option>
+            <option value="ausente">Ausente</option>
+            <option value="vencida">Vencida</option>
           </select>
         </div>
         <div className="field">
@@ -267,7 +303,7 @@ function ReservesTab() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th><th>Fecha</th><th>Cancha</th><th>Horario</th><th>Monto</th><th>Estado</th><th>Acciones</th>
+                <th>ID</th><th>Fecha</th><th>Cancha</th><th>Horario</th><th>Monto</th><th>Pago</th><th>Estado</th><th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -279,7 +315,12 @@ function ReservesTab() {
                   <td>{r.horary ? `${r.horary.day} ${r.horary.label}` : `Horario #${r.idHorary}`}</td>
                   <td>{r.formattedAmount}</td>
                   <td>
-                    <span className={`status-pill status-pill--${r.stateReserva}`}>{r.stateReserva}</span>
+                    {r.paymentMethodLabel}
+                    {r.hasBalance && <div className="hint">{`Resta ${r.formattedBalance}`}</div>}
+                    {r.isCashPaid && <div className="hint">Saldo cobrado</div>}
+                  </td>
+                  <td>
+                    <span className={`status-pill status-pill--${r.stateClass}`}>{r.stateLabel}</span>
                   </td>
                   <td>
                     <div className="row-actions">
@@ -292,7 +333,33 @@ function ReservesTab() {
                         <option value="pendiente">Pendiente</option>
                         <option value="confirmada">Confirmada</option>
                         <option value="cancelada">Cancelada</option>
+                        <option value="ausente">Ausente</option>
+                        <option value="vencida">Vencida</option>
                       </select>
+                      {r.canRegisterCash && (
+                        <button
+                          className="btn btn--sm btn--cash"
+                          type="button"
+                          onClick={() => {
+                            setResult((prev) => ({ ...prev, error: null }))
+                            setConfirmingCash(r)
+                          }}
+                        >
+                          Registrar pago en efectivo
+                        </button>
+                      )}
+                      {r.canMarkAbsent && (
+                        <button
+                          className="btn btn--sm btn--outline"
+                          type="button"
+                          onClick={() => {
+                            setResult((prev) => ({ ...prev, error: null }))
+                            setConfirmingAbsent(r)
+                          }}
+                        >
+                          No se presentó
+                        </button>
+                      )}
                       <button className="btn btn--sm btn--outline" type="button" onClick={() => setDetailId(r.idReserve)}>
                         Ver detalle
                       </button>
@@ -316,6 +383,38 @@ function ReservesTab() {
       )}
 
       <ReserveDetailDialog idReserve={detailId} onClose={closeDetail} />
+
+      <ConfirmDialog
+        open={Boolean(confirmingCash)}
+        tone="confirm"
+        title="Registrar pago en efectivo"
+        message={
+          confirmingCash
+            ? `Confirmá que cobraste ${confirmingCash.formattedBalance} en efectivo por la reserva #${confirmingCash.idReserve} del ${confirmingCash.dateReserve}. La reserva queda pagada por completo.`
+            : ''
+        }
+        confirmLabel="Sí, ya pagó"
+        cancelLabel="Volver"
+        busy={settling}
+        onConfirm={handleCashConfirmed}
+        onCancel={() => setConfirmingCash(null)}
+      />
+
+      <ConfirmDialog
+        open={Boolean(confirmingAbsent)}
+        tone="danger"
+        title="Marcar como ausente"
+        message={
+          confirmingAbsent
+            ? `La reserva #${confirmingAbsent.idReserve} del ${confirmingAbsent.dateReserve} pasa a "ausente". El complejo se queda con la seña de ${confirmingAbsent.formattedDeposit}.`
+            : ''
+        }
+        confirmLabel="Sí, no se presentó"
+        cancelLabel="Volver"
+        busy={settling}
+        onConfirm={handleAbsentConfirmed}
+        onCancel={() => setConfirmingAbsent(null)}
+      />
 
       <ConfirmDialog
         open={Boolean(confirmingDelete)}

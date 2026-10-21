@@ -25,6 +25,10 @@ export function updateReserveState(idReserve, stateReserva) {
   return client.patch(`/reservas/${idReserve}/estado`, { stateReserva }).then((r) => r.data)
 }
 
+export function registerCashPayment(idReserve) {
+  return client.patch(`/reservas/${idReserve}/pago-efectivo`).then((r) => r.data)
+}
+
 export function deleteReserve(idReserve) {
   return client.delete(`/reservas/${idReserve}`).then((r) => r.data)
 }

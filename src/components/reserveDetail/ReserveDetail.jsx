@@ -32,8 +32,34 @@ export default function ReserveDetail({ reserve }) {
         </div>
       )}
 
+      <div className="detail-list__row">
+        <span>Forma de pago</span>
+        <span className="detail-list__value">{reserve.paymentMethodLabel}</span>
+      </div>
+
+      {reserve.isCash && reserve.isPaid && (
+        <div className="detail-list__row">
+          <span>Seña pagada</span>
+          <span className="detail-list__value">{reserve.formattedDeposit}</span>
+        </div>
+      )}
+
+      {reserve.hasBalance && (
+        <div className="detail-list__row">
+          <span>Resta pagar en efectivo</span>
+          <span className="detail-list__value">{reserve.formattedBalance}</span>
+        </div>
+      )}
+
+      {reserve.isCashPaid && (
+        <div className="detail-list__row">
+          <span>Saldo en efectivo</span>
+          <span className="detail-list__value">Pagado</span>
+        </div>
+      )}
+
       <div className="detail-list__row detail-list__row--total">
-        <span>{reserve.isPaid ? 'Total pagado' : 'Total'}</span>
+        <span>{reserve.isFullyPaid ? 'Total pagado' : 'Total'}</span>
         <span className="detail-list__value">{reserve.formattedAmount}</span>
       </div>
     </div>

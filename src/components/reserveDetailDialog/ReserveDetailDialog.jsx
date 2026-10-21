@@ -72,7 +72,7 @@ export default function ReserveDetailDialog({ idReserve, onClose }) {
         {reserve && (
           <>
             <div>
-              <span className={`status-pill status-pill--${reserve.stateReserva}`}>{reserve.stateReserva}</span>
+              <span className={`status-pill status-pill--${reserve.stateClass}`}>{reserve.stateLabel}</span>
             </div>
             <ReserveDetail reserve={reserve} />
             {reserve.paymentLabel && <p className="hint">{reserve.paymentLabel}</p>}

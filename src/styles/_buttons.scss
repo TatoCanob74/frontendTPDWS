@@ -82,6 +82,42 @@
     }
   }
 
+  // Formas de pago: verde billete para efectivo, celeste de Mercado Pago
+  &--cash,
+  &--mp {
+    color: #fff;
+    padding: 12px 24px;
+
+    &:hover {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  &--cash {
+    background: #2e7d32;
+    box-shadow: 0 10px 26px -8px rgba(46, 125, 50, 0.5);
+
+    &:hover {
+      background: #1b5e20;
+    }
+  }
+
+  &--mp {
+    background: #009ee3;
+    box-shadow: 0 10px 26px -8px rgba(0, 158, 227, 0.5);
+
+    &:hover {
+      background: #0081bb;
+    }
+  }
+
   &--danger-solid {
     background: #9a3324;
     color: #fff;

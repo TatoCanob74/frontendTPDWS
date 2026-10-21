@@ -28,8 +28,9 @@ export function cancelReserve(idReserve) {
   return client.patch(`/reservas/${idReserve}/cancelar`).then((r) => r.data)
 }
 
-export function createPaymentPreference(idReserve) {
-  return client.post(`/reserves/${idReserve}/pago`).then((r) => r.data)
+// metodo: 'MERCADO_PAGO' cobra el total; 'EFECTIVO' cobra solo la seña
+export function createPaymentPreference(idReserve, metodo = 'MERCADO_PAGO') {
+  return client.post(`/reserves/${idReserve}/pago`, { metodo }).then((r) => r.data)
 }
 
 export function confirmPayment(idReserve, paymentId) {

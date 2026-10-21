@@ -43,6 +43,18 @@
     background: #fdecea;
     color: #9a3324;
   }
+
+  // Confirmada con seña: falta cobrar el resto en efectivo
+  &--senada {
+    background: #e3f2fd;
+    color: #0d5c8c;
+  }
+
+  &--ausente,
+  &--vencida {
+    background: #eceff1;
+    color: #455a64;
+  }
 }
 
 .table-wrap {

@@ -9,7 +9,7 @@ const PENDING_STATUSES = ['pending', 'in_process', 'in_mediation', 'authorized']
 
 function isSettled(reserve) {
   if (!reserve) return false
-  if (reserve.stateReserva === 'confirmada' || reserve.stateReserva === 'cancelada') return true
+  if (['confirmada', 'cancelada', 'vencida'].includes(reserve.stateReserva)) return true
   return Boolean(reserve.paymentStatus) && !PENDING_STATUSES.includes(reserve.paymentStatus)
 }
 

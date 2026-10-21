@@ -27,9 +27,11 @@ export default function PagoExito() {
         <span className="eyebrow">Pago</span>
         <h2>{confirmed ? '¡Reserva confirmada!' : '¡Gracias por tu reserva!'}</h2>
         <p>
-          {confirmed
-            ? 'Tu pago fue aprobado y la cancha ya es tuya.'
-            : 'Estamos confirmando tu pago con MercadoPago.'}
+          {!confirmed
+            ? 'Estamos confirmando tu pago con MercadoPago.'
+            : reserve.hasBalance
+              ? `Tu seña fue aprobada y la cancha ya es tuya. Recordá llevar ${reserve.formattedBalance} en efectivo al complejo.`
+              : 'Tu pago fue aprobado y la cancha ya es tuya.'}
         </p>
       </div>
 
@@ -40,7 +42,9 @@ export default function PagoExito() {
         {!loading && reserve && (
           <div className={`alert ${confirmed ? '' : 'alert--error'}`}>
             {confirmed
-              ? 'Pago aprobado · Reserva confirmada'
+              ? reserve.hasBalance
+                ? 'Seña aprobada · Reserva confirmada'
+                : 'Pago aprobado · Reserva confirmada'
               : `El pago quedó en estado: ${reserve.paymentStatus || 'pendiente'}.`}
           </div>
         )}

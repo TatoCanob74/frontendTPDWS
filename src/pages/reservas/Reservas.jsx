@@ -56,7 +56,7 @@ export default function Reservas() {
     setNotice(null)
     setError(null)
     try {
-      const { init_point } = await createPaymentPreference(reserve.idReserve)
+      const { init_point } = await createPaymentPreference(reserve.idReserve, reserve.paymentMethod)
       window.location.assign(init_point)
     } catch (err) {
       setError(err.response?.data?.message || 'No pudimos generar el link de pago.')
@@ -92,9 +92,17 @@ export default function Reservas() {
                 {r.scheduleLabel ? ` · ${r.scheduleLabel}` : ''}
                 {r.complexName ? ` · ${r.complexName}`: ''}
                 {r.paymentLabel && <div className="hint">{r.paymentLabel}</div>}
+                {r.hasBalance && (
+                  <div className="hint">{`Seña pagada · Resta ${r.formattedBalance} en efectivo en el complejo`}</div>
+                )}
+                {r.isCashPaid && <div className="hint">Saldo pagado en efectivo</div>}
+                {r.canBePaid && r.paymentDeadlineLabel && (
+                  <div className="hint">{`Pagá antes de las ${r.paymentDeadlineLabel} o el horario se libera`}</div>
+                )}
+                {r.isExpired && <div className="hint">Venció sin pagarse y el horario se liberó</div>}
               </div>
               <div>{r.formattedAmount}</div>
-              <span className={`status-pill status-pill--${r.stateReserva}`}>{r.stateReserva}</span>
+              <span className={`status-pill status-pill--${r.stateClass}`}>{r.stateLabel}</span>
               <div className="row-actions">
                 <button className="btn btn--sm btn--outline" type="button" onClick={() => setDetailId(r.idReserve)}>
                   Ver detalle
@@ -106,7 +114,7 @@ export default function Reservas() {
                     disabled={payingId === r.idReserve}
                     onClick={() => handlePay(r)}
                   >
-                    {payingId === r.idReserve ? 'Abriendo pago…' : 'Pagar'}
+                    {payingId === r.idReserve ? 'Abriendo pago…' : r.isCash ? 'Pagar seña' : 'Pagar'}
                   </button>
                 )}
                 {r.canBeCancelled && (

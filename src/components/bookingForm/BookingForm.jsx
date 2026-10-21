@@ -6,6 +6,9 @@ import { getServices } from '../../api/services'
 import { createReserve, createPaymentPreference } from '../../api/reserves'
 import { DAYS, SHIFTS } from '../../models/horary'
 import { formatCurrency } from '../../utils/currency'
+import { DEPOSIT_PERCENT } from '../../models/reserve'
+import CashDepositDialog from '../cashDepositDialog/CashDepositDialog'
+import { BanknoteIcon, MercadoPagoIcon } from '../paymentIcons/PaymentIcons'
 
 const SPORTS = [
   { value: 'futbol', label: 'Fútbol', icon: '⚽' },
@@ -43,6 +46,8 @@ export default function BookingForm() {
   const [courtsResult, setCourtsResult] = useState({ key: null, data: [], error: false })
   const [status, setStatus] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [cashDialogOpen, setCashDialogOpen] = useState(false)
+  const closeCashDialog = useCallback(() => setCashDialogOpen(false), [])
 
   const day = useMemo(() => dayOfWeek(date), [date])
 
@@ -154,19 +159,32 @@ export default function BookingForm() {
     )
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  // true si se puede seguir con el pago; si no, redirige al login o muestra el error
+  function canStartPayment() {
     setStatus(null)
 
     if (!isAuthenticated) {
       navigate('/login', { state: { from: { pathname: '/canchas' } } })
-      return
+      return false
     }
     if (!selectedHorario) {
       setStatus({ type: 'error', message: 'Elegí un horario para continuar.' })
-      return
+      return false
     }
+    return true
+  }
 
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (canStartPayment()) startPayment('MERCADO_PAGO')
+  }
+
+  // Efectivo: antes de crear la reserva se muestra cuánto es la seña y cuánto queda para el complejo
+  function handleCashClick() {
+    if (canStartPayment()) setCashDialogOpen(true)
+  }
+
+  async function startPayment(metodo) {
     setSubmitting(true)
     try {
       const { reserve } = await createReserve({
@@ -177,7 +195,7 @@ export default function BookingForm() {
         idHorary: selectedHorario.idHorary,
         services: selectedServices
       })
-      const { init_point, autoReturn } = await createPaymentPreference(reserve.idReserve)
+      const { init_point, autoReturn } = await createPaymentPreference(reserve.idReserve, metodo)
 
       if (autoReturn) {
         window.location.assign(init_point)
@@ -194,6 +212,7 @@ export default function BookingForm() {
       checkout.opener = null
       navigate(`/pago/pendiente?reserva=${reserve.idReserve}&esperando=1`)
     } catch (err) {
+      setCashDialogOpen(false)
       setStatus({
         type: 'error',
         message:
@@ -418,9 +437,25 @@ export default function BookingForm() {
             {total !== null ? formatCurrency(total) : '—'}
           </span>
         </div>
-        <button className="btn btn--primary" type="submit" disabled={submitting}>
-          {submitting ? 'Procesando…' : isAuthenticated ? 'Confirmar y pagar' : 'Ingresá para reservar'}
-        </button>
+        {isAuthenticated ? (
+          <div className="pay-options" role="group" aria-label="Forma de pago">
+            <button className="btn btn--cash" type="button" disabled={submitting} onClick={handleCashClick}>
+              <BanknoteIcon />
+              <span className="pay-options__text">
+                Efectivo
+                <small>Seña del {DEPOSIT_PERCENT}% online</small>
+              </span>
+            </button>
+            <button className="btn btn--mp" type="submit" disabled={submitting}>
+              <MercadoPagoIcon />
+              {submitting && !cashDialogOpen ? 'Procesando…' : 'Mercado Pago'}
+            </button>
+          </div>
+        ) : (
+          <button className="btn btn--primary" type="submit">
+            Ingresá para reservar
+          </button>
+        )}
       </div>
 
       {status && (
@@ -428,6 +463,14 @@ export default function BookingForm() {
           {status.message}
         </div>
       )}
+
+      <CashDepositDialog
+        open={cashDialogOpen && total !== null}
+        total={total}
+        busy={submitting}
+        onConfirm={() => startPayment('EFECTIVO')}
+        onCancel={closeCashDialog}
+      />
     </form>
   )
 }
