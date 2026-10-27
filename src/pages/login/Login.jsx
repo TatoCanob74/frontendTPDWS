@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { resendCode } from '../../api/auth'
+import Turnstile from '../../components/turnstile/Turnstile.jsx'
 
 export default function Login() {
   const { login } = useAuth()
@@ -11,6 +12,7 @@ export default function Login() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [needsVerification, setNeedsVerification] = useState(false)
+  const [trunstileVer, setTrunstileVer] = useState(null)
 
   const exitResetPassword = location.state?.passwordReset || false;
 
@@ -25,6 +27,12 @@ export default function Login() {
     setError(null)
     setLoading(true)
     setNeedsVerification(false)
+    setTrunstileVer(false)
+
+    if(!trunstileVer) {
+      return;
+    }
+
     try {
       await login(form.emailUser, form.passwordUser)
       const redirectTo = location.state?.from?.pathname || '/canchas'
@@ -33,6 +41,9 @@ export default function Login() {
       setError(err.response?.data?.message || err.response?.data?.error || 'No pudimos iniciar sesión. Revisá tus datos.')
       if(err.response?.data?.code === 'EMAIL_NO_VERIFICADO'){
         setNeedsVerification(true);
+      }
+      if(err.response?.data?.captcha === 'CAPTCHA NO VALIDADO'){
+        setTrunstileVer(false);
       }
     } finally {
       setLoading(false)
@@ -92,6 +103,12 @@ export default function Login() {
            </p>
         </div>
 
+        <Turnstile 
+          onVerify={(token) => setTrunstileVer(token)}
+          onExpire={() => setTrunstileVer(null)}
+          onError={() => setTrunstileVer(null)}
+        />
+
         {exitResetPassword && !error && <div
           className="alert" role="status">
           Contraseña actualizada. Ya podés iniciar sesión.
@@ -113,7 +130,7 @@ export default function Login() {
 
         <div className="booking__foot">
           <span className="summary__label">¿No tenés cuenta? <Link to="/register">Registrate</Link></span>
-          <button className="btn btn--primary" type="submit" disabled={loading}>
+          <button className="btn btn--primary" type="submit" disabled={loading | !trunstileVer}>
             {loading ? 'Ingresando…' : 'Ingresar'}
           </button>
         </div>
