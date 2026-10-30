@@ -1,22 +1,21 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 
-export default function Turnstile({ onVerify, onExpire, onError, action }) {
+const Turnstile = forwardRef(({ onVerify, onExpire, onError, action }, ref) => {
+  const turnstileRef = useRef(null);
+  const widgetIdRef = useRef(null);
+  const callbacks = useRef({ onVerify, onExpire, onError });
 
-const turnstileRef = useRef(null)
+  useEffect(() => {
+    callbacks.current = { onVerify, onExpire, onError };
+  }, [onVerify, onExpire, onError]);
 
-const callbacks = useRef({ onVerify, onExpire, onError})
-
-useEffect(() => {
-  callbacks.current = { onVerify, onExpire, onError };
-}, [onVerify, onExpire, onError]);
-
-useEffect(() => {
+  useEffect(() => {
     if (!window.turnstile) {
       console.error("Turnstile no está cargado");
       return;
     }
 
-    const widgetId = window.turnstile.render(turnstileRef.current, {
+    widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
       sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
       theme: "light",
       action: action,
@@ -26,11 +25,19 @@ useEffect(() => {
     });
 
     return () => {
-      window.turnstile.remove(widgetId);
+      window.turnstile.remove(widgetIdRef.current);
     };
-  }, []);
+  }, [action]);
 
-return (
-<div ref={turnstileRef}></div>
-)
-};
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      if (window.turnstile && widgetIdRef.current !== null) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
+    }
+  }), []);
+
+  return <div ref={turnstileRef}></div>;
+});
+
+export default Turnstile;

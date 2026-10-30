@@ -39,8 +39,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = useCallback(
-    async (emailUser, passwordUser) => {
-      const data = await loginRequest({ emailUser, passwordUser })
+    async (emailUser, passwordUser, turnstileToken) => {
+      const data = await loginRequest({ emailUser, passwordUser, turnstileToken })
       applyToken(data.token)
       return data
     },

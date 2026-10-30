@@ -1,7 +1,7 @@
 import { client } from './client'
 
-export function login({ emailUser, passwordUser }) {
-  return client.post('/auth/login', { emailUser, passwordUser }).then((r) => r.data)
+export function login({ emailUser, passwordUser, turnstileToken }) {
+  return client.post('/auth/login', { emailUser, passwordUser, turnstileToken }).then((r) => r.data)
 }
 
 export function register(data) {
