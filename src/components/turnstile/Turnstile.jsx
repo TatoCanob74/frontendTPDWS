@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 
-export default function Turnstile({ onVerify, onExpire, onError }) {
+export default function Turnstile({ onVerify, onExpire, onError, action }) {
 
 const turnstileRef = useRef(null)
 
-const callbacks = useRef({ onVerify, onExpire, onError })
+const callbacks = useRef({ onVerify, onExpire, onError})
 
 useEffect(() => {
   callbacks.current = { onVerify, onExpire, onError };
@@ -19,15 +19,10 @@ useEffect(() => {
     const widgetId = window.turnstile.render(turnstileRef.current, {
       sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
       theme: "light",
-      callback: (token) => {
-        if (onVerify) onVerify(token);
-      },
-      'expired-callback': () => {
-        if (onExpire) onExpire();
-      },
-      'error-callback': () => {
-        if (onError) onError();
-      }
+      action: action,
+      callback: (token) => callbacks.current.onVerify?.(token),
+      'expired-callback': () => callbacks.current.onExpire?.(),
+      'error-callback': () => callbacks.current.onError?.()
     });
 
     return () => {
